@@ -1,0 +1,17 @@
+[
+  {
+    "nombre": "buscar_definicion",
+    "descripcion": "Busca la definición de un término.",
+    "esquema": {
+      "type": "object",
+      "properties": {
+        "termino": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "termino"
+      ]
+    }
+  }
+]

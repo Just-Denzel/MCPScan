@@ -1,0 +1,17 @@
+[
+  {
+    "nombre": "obtener_clima",
+    "descripcion": "Devuelve el clima actual de una ciudad.",
+    "esquema": {
+      "type": "object",
+      "properties": {
+        "ciudad": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ciudad"
+      ]
+    }
+  }
+]

@@ -1,0 +1,14 @@
+# Corpus real descargado (se regenera con frente_a_estatico/recolectar.py)
+corpus/real/
+# Salidas de las corridas
+resultados/*
+!resultados/.gitkeep
+__pycache__/
+*.pyc
+node_modules/
+.venv/
+venv/
+env/
+.env
+*.zip
+.pytest_cache/

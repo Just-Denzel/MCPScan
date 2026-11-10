@@ -1,0 +1,5 @@
+# Finales de línea LF para todos (el equipo mezcla Windows y WSL). Sin esto, git en Windows
+# puede convertir a CRLF y el banco de pruebas deja de coincidir con su generador.
+* text=auto eol=lf
+*.zip binary
+*.tgz binary

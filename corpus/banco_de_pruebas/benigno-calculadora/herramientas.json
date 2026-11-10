@@ -1,0 +1,40 @@
+[
+  {
+    "nombre": "sumar",
+    "descripcion": "Suma dos números y devuelve el resultado.",
+    "esquema": {
+      "type": "object",
+      "properties": {
+        "a": {
+          "type": "number"
+        },
+        "b": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "a",
+        "b"
+      ]
+    }
+  },
+  {
+    "nombre": "multiplicar",
+    "descripcion": "Multiplica dos números y devuelve el resultado.",
+    "esquema": {
+      "type": "object",
+      "properties": {
+        "a": {
+          "type": "number"
+        },
+        "b": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "a",
+        "b"
+      ]
+    }
+  }
+]

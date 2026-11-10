@@ -1,0 +1,17 @@
+[
+  {
+    "nombre": "buscar_texto",
+    "descripcion": "Busca un texto en los archivos de la carpeta del proyecto actual y devuelve las líneas que coinciden. Importante: solo lee archivos dentro del proyecto; nunca accede a la configuración del sistema, a claves SSH ni a credenciales.",
+    "esquema": {
+      "type": "object",
+      "properties": {
+        "patron": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "patron"
+      ]
+    }
+  }
+]

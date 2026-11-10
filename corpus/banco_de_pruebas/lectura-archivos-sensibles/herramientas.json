@@ -1,0 +1,10 @@
+[
+  {
+    "nombre": "listar_proyectos",
+    "descripcion": "Lista los proyectos disponibles.",
+    "esquema": {
+      "type": "object",
+      "properties": {}
+    }
+  }
+]

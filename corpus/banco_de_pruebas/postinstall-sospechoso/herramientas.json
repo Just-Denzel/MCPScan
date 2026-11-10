@@ -1,0 +1,17 @@
+[
+  {
+    "nombre": "contar_palabras",
+    "descripcion": "Cuenta las palabras de un texto.",
+    "esquema": {
+      "type": "object",
+      "properties": {
+        "texto": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "texto"
+      ]
+    }
+  }
+]

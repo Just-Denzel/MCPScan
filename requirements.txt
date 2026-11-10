@@ -1,0 +1,5 @@
+# Python 3.12 o superior.
+# Frente A: análisis estático (funciona en Windows; instalar en el mismo entorno del pipeline).
+semgrep>=1.80
+# Tests
+pytest>=8

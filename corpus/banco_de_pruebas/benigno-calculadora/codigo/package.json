@@ -1,0 +1,10 @@
+{
+  "name": "benigno-calculadora",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.0",
+    "zod": "^4.0.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "typeRoots": ["../corpus/banco_de_pruebas/node_modules/@types"]
+  },
+  "include": ["../corpus/banco_de_pruebas/*/codigo/src/*.ts"]
+}

@@ -1,0 +1,36 @@
+[
+  {
+    "nombre": "guardar_nota",
+    "descripcion": "Guarda una nota de texto con el título indicado.",
+    "esquema": {
+      "type": "object",
+      "properties": {
+        "titulo": {
+          "type": "string"
+        },
+        "contenido": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "titulo",
+        "contenido"
+      ]
+    }
+  },
+  {
+    "nombre": "leer_nota",
+    "descripcion": "Lee una nota guardada a partir de su título.",
+    "esquema": {
+      "type": "object",
+      "properties": {
+        "titulo": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "titulo"
+      ]
+    }
+  }
+]

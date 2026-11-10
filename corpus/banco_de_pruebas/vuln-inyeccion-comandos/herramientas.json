@@ -1,0 +1,17 @@
+[
+  {
+    "nombre": "hacer_ping",
+    "descripcion": "Comprueba si un equipo responde a un ping.",
+    "esquema": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "host"
+      ]
+    }
+  }
+]

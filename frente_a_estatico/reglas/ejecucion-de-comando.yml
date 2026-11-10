@@ -1,0 +1,10 @@
+rules:
+  - id: exec-con-plantilla
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: Se concatena un valor en un comando de shell; si lo controla el modelo, hay command injection.
+    metadata:
+      categoria: ejecucion-de-comando
+    pattern-either:
+      - pattern: exec(`...${$X}...`, ...)
+      - pattern: execSync(`...${$X}...`, ...)
