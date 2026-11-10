@@ -1,7 +1,7 @@
 # Banco de pruebas de MCPScan
 
-13 servidores MCP escritos por el equipo para medir precisión y recall:
-5 benignos (3 de ellos parecidos a los maliciosos, para medir falsos positivos) y 8 con un problema conocido.
+18 servidores MCP escritos por el equipo para medir precisión y recall:
+6 benignos (4 de ellos parecidos a los maliciosos, para medir falsos positivos) y 12 con un problema conocido.
 Misma estructura que el corpus real: una carpeta por servidor con
 `manifest.json`, `herramientas.json` y `codigo/`.
 
@@ -22,6 +22,7 @@ Se regeneran con `python -m frente_c_pipeline.generar_banco corpus/banco_de_prue
 | benigno-ping-seguro | benigno | `execFile` sin shell: versión segura del de inyección |
 | benigno-api-clima | benigno | Red y variable de entorno usadas de forma legítima |
 | benigno-busqueda-proyecto | benigno | Descripción con "Importante" y "credenciales", sin ataque |
+| benigno-codificar-base64 | benigno | Usa base64 sin ejecutar nada (falsos positivos de ofuscación) |
 | poison-instruccion-oculta | malicioso | Tool poisoning evidente (`<IMPORTANT>`) |
 | poison-unicode-invisible | malicioso | Texto oculto en Unicode invisible |
 | poison-parafraseado | malicioso | Tool poisoning sin palabras clave |
@@ -30,3 +31,7 @@ Se regeneran con `python -m frente_c_pipeline.generar_banco corpus/banco_de_prue
 | lectura-archivos-sensibles | malicioso | Lee `~/.ssh` y `~/.aws` |
 | postinstall-sospechoso | malicioso | Script `postinstall` que sale a la red |
 | secretos-y-typosquat | malicioso | Secretos en código y dependencia `lodahs` |
+| poison-parametro | malicioso | Instrucción oculta en la descripción de un parámetro |
+| poison-otra-herramienta | malicioso | Manipula el uso de una herramienta de otro servidor |
+| ofuscado-base64 | malicioso | Código en base64 ejecutado con `new Function` |
+| exfil-minificado | malicioso | Exfiltración en código minificado dentro de `dist/` |

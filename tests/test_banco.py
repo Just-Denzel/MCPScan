@@ -38,4 +38,4 @@ def test_cada_servidor_tiene_el_formato_de_corpus():
 def test_hay_benignos_y_maliciosos():
     gt = json.loads((BANCO / "ground_truth.json").read_text(encoding="utf-8"))
     etiquetas = [s["etiqueta"] for s in gt["servidores"]]
-    assert etiquetas.count("benigno") >= 5 and etiquetas.count("malicioso") >= 8
+    assert etiquetas.count("benigno") >= 6 and etiquetas.count("malicioso") >= 12

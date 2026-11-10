@@ -39,6 +39,7 @@ corpus/<conjunto>/
 ]
 ```
 
+- Las descripciones de los **parámetros** van en `esquema.properties.<parámetro>.description`. El modelo también las lee, así que el frente B debe revisarlas.
 - El banco de pruebas trae `herramientas.json` listo. Los servidores reales descargados de npm **no lo traen**. Ver `frente_b_descripciones/README.md`.
 - `fuente` es `npm` para los reales y `local` para los del banco de pruebas.
 
@@ -77,9 +78,12 @@ Cada vez que una regla o el clasificador detecta algo, se crea con `comun.format
 | `secreto-hardcodeado` | Claves o credenciales en el código | A |
 | `dependencia-typosquat` | Dependencia con nombre parecido a una popular | A |
 | `script-instalacion` | `preinstall`, `install` o `postinstall` en `package.json` | A |
+| `codigo-ofuscado` | Código oculto (base64, códigos de caracteres) ejecutado con `eval` o `new Function` | A |
 | `tool-poisoning-instruccion` | Instrucción evidente dirigida al modelo en una descripción | B |
 | `tool-poisoning-unicode` | Texto oculto en caracteres Unicode invisibles | B |
 | `tool-poisoning-parafraseado` | Instrucción reformulada, sin palabras clave típicas | B |
+
+Qué cuenta y qué no en cada categoría, con sus variantes: ver **[docs/categorias.md](categorias.md)**.
 
 Para agregar una categoría: agregarla en `comun/formatos.py`, en el ground truth (`frente_c_pipeline/generar_banco.py`) y en esta tabla.
 

@@ -11,6 +11,8 @@ Detecta instrucciones ocultas dirigidas al modelo dentro del texto que describe 
 
 ## Cómo se conecta al pipeline
 
+Qué cuenta en cada categoría y en qué variantes puede aparecer está en **[docs/categorias.md](../docs/categorias.md)**. Escriban las heurísticas y el prompt contra esa especificación: al final se evalúan también contra un conjunto de validación con variantes que no están en el banco.
+
 El pipeline llama a `analizar(dir_servidor)` de cada módulo registrado en `ANALIZADORES` (`frente_c_pipeline/pipeline.py`). La función lee `<servidor>/herramientas.json` y devuelve hallazgos creados con `comun.formatos.hallazgo(...)`, con una de estas categorías: `tool-poisoning-instruccion`, `tool-poisoning-unicode`, `tool-poisoning-parafraseado`.
 
 **Para poder comparar las técnicas, cada una debe ser su propio módulo**, por ejemplo:
@@ -28,7 +30,9 @@ Se registran los dos en `ANALIZADORES`, y la matriz de detección de `evaluar.py
 - Etiquetas tipo `<IMPORTANT>`, o frases como "no menciones esto al usuario" o "ignora las instrucciones anteriores".
 - Caracteres Unicode invisibles: el bloque *tags* (U+E0000 a U+E007F) y los de ancho cero (U+200B, U+200C, U+200D, U+2060).
 - Rutas o archivos sensibles: `~/.ssh`, `.env`, `id_rsa`, `credentials`.
-- Referencias a otras herramientas del servidor.
+- Referencias a otras herramientas, incluso de **otros servidores** (*tool shadowing*).
+- Instrucciones escondidas después de muchas líneas en blanco.
+- **Las descripciones de los parámetros** (`esquema.properties.*.description`), no solo la de la herramienta.
 - Parámetros sin relación con la función de la herramienta (por ejemplo, `contexto` en una suma).
 
 Cuidado: `benigno-busqueda-proyecto` tiene una descripción benigna que dice "Importante", "claves SSH" y "credenciales". Una heurística que solo busque palabras clave la marcará.
@@ -48,6 +52,8 @@ Cuidado: `benigno-busqueda-proyecto` tiene una descripción benigna que dice "Im
 | `poison-instruccion-oculta` | Lo detectan las heurísticas y el LLM |
 | `poison-unicode-invisible` | Lo detectan las heurísticas; el LLM puede no ver los caracteres invisibles |
 | `poison-parafraseado` | Lo detecta el LLM; las heurísticas probablemente no |
+| `poison-parametro` | Solo si se revisan las descripciones de los parámetros |
+| `poison-otra-herramienta` | Lo detectan las heurísticas (referencia a otra herramienta) y el LLM |
 | `benigno-busqueda-proyecto` | No se marca, aunque tiene palabras sospechosas |
 | demás `benigno-*` | No se marcan |
 

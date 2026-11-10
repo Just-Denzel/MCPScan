@@ -1,0 +1,10 @@
+[
+  {
+    "nombre": "hora_utc",
+    "descripcion": "Devuelve la hora UTC actual.",
+    "esquema": {
+      "type": "object",
+      "properties": {}
+    }
+  }
+]

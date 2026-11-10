@@ -1,6 +1,7 @@
 # Corpus
 
-- `banco_de_pruebas/`: 13 servidores escritos por el equipo, con respuestas conocidas (`ground_truth.json`): 5 benignos y 8 maliciosos. Es lo que se usa para medir precisión y recall. Está versionado en git. **No se edita a mano**: se edita `frente_c_pipeline/generar_banco.py` y se regenera con `python -m frente_c_pipeline.generar_banco corpus/banco_de_pruebas` (un test lo comprueba).
+- `banco_de_pruebas/`: 18 servidores escritos por el equipo, con respuestas conocidas (`ground_truth.json`): 6 benignos y 12 maliciosos. Es el conjunto de **desarrollo**. Es lo que se usa para medir precisión y recall. Está versionado en git. **No se edita a mano**: se edita `frente_c_pipeline/generar_banco.py` y se regenera con `python -m frente_c_pipeline.generar_banco corpus/banco_de_pruebas` (un test lo comprueba).
+- `validacion/`: conjunto de **validación privado**, con variantes que el resto del equipo no ve. **No se sube a git**; lo tiene solo el frente C y se usa al final (ver `frente_c_pipeline/README.md`).
 - `real/`: servidores públicos de npm. **No se sube a git.** Se descarga con:
 
 ```bash

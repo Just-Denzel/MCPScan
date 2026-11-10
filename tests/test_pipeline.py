@@ -21,7 +21,8 @@ def test_un_analizador_que_falla_no_detiene_la_corrida(monkeypatch):
     import sys
     monkeypatch.setitem(sys.modules, "analizador_que_falla", _Falla)
     hall, errores = correr(BANCO, ["frente_b_descripciones.analizador", "analizador_que_falla"])
-    assert len(errores) == 13                      # uno por servidor
+    n = sum(1 for p in BANCO.iterdir() if (p / "manifest.json").exists())
+    assert len(errores) == n                       # uno por servidor
     assert any(h["servidor"] == "poison-instruccion-oculta" for h in hall)
 
 

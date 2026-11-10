@@ -35,6 +35,9 @@ Si Semgrep falla, el analizador lanza un error en vez de devolver una lista vac�
 | `secreto-hardcodeado` | gitleaks, o reglas de Semgrep para secretos | Falta |
 | `dependencia-typosquat` | Python: comparar nombres de `package.json` con los paquetes populares de npm | Falta |
 | `script-instalacion` | Python: leer `scripts` de `package.json` | Falta |
+| `codigo-ofuscado` | Semgrep: `eval`, `new Function`, `vm.*` sobre texto decodificado (base64, códigos de caracteres) | Falta |
+
+Qué cuenta en cada categoría y en qué variantes puede aparecer está en **[docs/categorias.md](../docs/categorias.md)**. Escriban las reglas contra esa especificación: al final se evalúan también contra un conjunto de validación con variantes que no están en el banco.
 
 La regla de `ejecucion-de-comando` es simple a propósito. Una mejora importante es pasarla a modo **taint**, que sigue un valor desde el parámetro de una herramienta MCP hasta `exec`. Eso la hace específica de MCP.
 
@@ -47,6 +50,7 @@ El banco de pruebas trae benignos que se parecen a los maliciosos, justamente pa
 | `benigno-ping-seguro` | Cualquier ejecución de procesos (usa `execFile` con argumentos, sin shell) |
 | `benigno-api-clima` | Cualquier `fetch` o uso de `process.env` (los usa de forma legítima) |
 | `benigno-notas` | Cualquier lectura o escritura de archivos |
+| `benigno-codificar-base64` | Cualquier uso de base64, aunque no ejecute nada |
 
 `tests/test_pipeline.py` falla si una regla marca algún benigno.
 
@@ -73,7 +77,7 @@ python frente_a_estatico/recolectar.py corpus/real --n 100
 
 ## Notas
 
-- Muchos paquetes de npm traen JavaScript compilado o minificado, no TypeScript. Las reglas sirven para ambos, pero los hallazgos pueden costar más de leer.
+- Muchos paquetes de npm traen JavaScript compilado o minificado, no TypeScript (el caso `exfil-minificado` lo imita en `dist/`). Las reglas deben revisar todos los archivos, no solo `src/`, y los hallazgos en código minificado cuestan más de leer.
 - Semgrep tarda unos 2 segundos por servidor (arranca una vez por cada uno); 100 servidores toman unos 4 minutos.
 - Semgrep funciona en Windows (probado). Instalarlo en el mismo Python o entorno virtual con que se corre el pipeline: `python -m pip install semgrep`.
 - Los hallazgos sobre servidores reales se **revisan a mano** antes de afirmar nada, y se anonimizan en el informe.

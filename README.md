@@ -38,9 +38,11 @@ MCPScan/
 ├── comun/
 │   └── formatos.py              Contrato: categorías, severidades, hallazgo() y validar()
 ├── docs/
-│   └── formatos.md              El contrato explicado (leer primero)
+│   ├── formatos.md              El contrato explicado (leer primero)
+│   └── categorias.md            Qué cuenta en cada categoría y sus variantes
 ├── corpus/
-│   ├── banco_de_pruebas/        13 servidores propios + ground_truth.json (versionado)
+│   ├── banco_de_pruebas/        18 servidores propios + ground_truth.json (desarrollo, versionado)
+│   ├── validacion/              conjunto de validación privado (NO se sube a git)
 │   └── real/                    servidores públicos descargados (NO se sube a git)
 ├── frente_a_estatico/           Análisis estático del código
 │   ├── analizador.py            analizar(dir_servidor) -> hallazgos
@@ -61,6 +63,15 @@ MCPScan/
 ```
 
 Cada frente tiene su propio README con qué entregar, qué falta y cómo probarlo.
+
+## Desarrollo y validación
+
+Hay dos conjuntos de servidores de prueba:
+
+- **Desarrollo** (`corpus/banco_de_pruebas`): todos lo ven y lo usan mientras escriben reglas y heurísticas.
+- **Validación** (`corpus/validacion`): variantes nuevas que **solo tiene el frente C** y que no se suben a git. Se evalúa una vez, al final.
+
+Las reglas se escriben contra la especificación de [docs/categorias.md](docs/categorias.md), no contra los ejemplos del banco. En el informe se reportan los dos resultados: si la validación da mucho peor que el desarrollo, las reglas memorizaron los ejemplos en vez de generalizar.
 
 ## Cómo conectar cada parte al pipeline
 
@@ -127,12 +138,20 @@ Notas para Windows:
 | Pieza | Estado |
 | --- | --- |
 | Contrato común (`comun/formatos.py`) | Listo, con validación |
-| Banco de pruebas: 13 servidores (5 benignos, 8 maliciosos) | Listo; compila con `tsc` y el generador lo reproduce idéntico |
+| Banco de desarrollo: 18 servidores (6 benignos, 12 maliciosos) | Listo; compila con `tsc` y el generador lo reproduce idéntico |
+| Conjunto de validación: 13 servidores (3 benignos, 10 maliciosos) | Listo; privado, fuera de git |
 | Pipeline, evaluador y reporte | Listos y probados |
 | Tests y CI | 11 tests pasando; CI escrita (se activa al subir a GitHub) |
 | Descarga de servidores públicos | Lista y probada con 100 paquetes de npm |
-| Sandbox con Docker | Probado en Windows con Docker Desktop: 13 servidores, detecta `lectura-archivos-sensibles`, ningún benigno marcado. Falta confirmar el aislamiento (ver `frente_c_pipeline/README.md`) |
+| Sandbox con Docker | Probado en Windows con Docker Desktop. Ahora también **confirma inyecciones** con payloads (verificado fuera de Docker sobre los 31 servidores); falta repetir en Docker y confirmar el aislamiento |
 | Frente A (reglas) | Una regla de ejemplo; faltan las demás |
 | Frente B (descripciones) | Placeholder que solo busca `<IMPORTANT>` |
 
-Con los analizadores de ejemplo y el sandbox, el banco de pruebas da precisión 1,00 y recall 0,30 (3 de 10 problemas esperados), sin marcar ningún benigno. Resultado reproducido en Windows el 9 de noviembre de 2026.
+Con los analizadores de ejemplo y el sandbox, sin marcar ningún benigno:
+
+| Conjunto | Precisión | Recall |
+| --- | --- | --- |
+| Desarrollo (18 servidores) | 1,00 | 0,21 (3 de 14 problemas) |
+| Validación (13 servidores) | 1,00 | 0,09 (1 de 11 problemas) |
+
+La diferencia ya muestra el riesgo de sobreajuste: la regla de ejemplo de Semgrep detecta la inyección del banco de desarrollo pero no su variante de validación. El sandbox, que prueba el comportamiento y no la forma del código, la confirma en ambos.

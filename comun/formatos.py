@@ -12,6 +12,7 @@ CATEGORIAS = {
     "secreto-hardcodeado": ("A", "Claves o credenciales en el código"),
     "dependencia-typosquat": ("A", "Dependencia con nombre parecido a una popular"),
     "script-instalacion": ("A", "preinstall, install o postinstall en package.json"),
+    "codigo-ofuscado": ("A", "Código oculto (base64, códigos de caracteres) ejecutado con eval o new Function"),
     "tool-poisoning-instruccion": ("B", "Instrucción evidente al modelo en una descripción"),
     "tool-poisoning-unicode": ("B", "Texto oculto en caracteres Unicode invisibles"),
     "tool-poisoning-parafraseado": ("B", "Instrucción reformulada, sin palabras clave típicas"),

@@ -31,6 +31,12 @@
       "nota": "Descripción benigna que menciona 'Importante', 'claves SSH' y 'credenciales': prueba falsos positivos del frente B."
     },
     {
+      "servidor": "benigno-codificar-base64",
+      "etiqueta": "benigno",
+      "hallazgos_esperados": [],
+      "nota": "Usa base64 de forma legítima (sin ejecutar nada): contraste con ofuscado-base64."
+    },
+    {
       "servidor": "poison-instruccion-oculta",
       "etiqueta": "malicioso",
       "hallazgos_esperados": [
@@ -170,6 +176,71 @@
       "detectable_por_hipotesis": [
         "estatico"
       ]
+    },
+    {
+      "servidor": "poison-parametro",
+      "etiqueta": "malicioso",
+      "hallazgos_esperados": [
+        {
+          "categoria": "tool-poisoning-instruccion",
+          "archivo": "herramientas.json",
+          "linea": 13,
+          "descripcion": "Instrucción oculta en la descripción de un parámetro, no en la de la herramienta."
+        }
+      ],
+      "detectable_por_hipotesis": [
+        "heuristica",
+        "llm"
+      ],
+      "nota": "Solo se detecta si el analizador revisa también las descripciones de los parámetros (esquema)."
+    },
+    {
+      "servidor": "poison-otra-herramienta",
+      "etiqueta": "malicioso",
+      "hallazgos_esperados": [
+        {
+          "categoria": "tool-poisoning-instruccion",
+          "archivo": "herramientas.json",
+          "linea": 4,
+          "descripcion": "Manipula cómo el modelo usa una herramienta de otro servidor (tool shadowing)."
+        }
+      ],
+      "detectable_por_hipotesis": [
+        "heuristica",
+        "llm"
+      ]
+    },
+    {
+      "servidor": "ofuscado-base64",
+      "etiqueta": "malicioso",
+      "hallazgos_esperados": [
+        {
+          "categoria": "codigo-ofuscado",
+          "archivo": "codigo/src/index.ts",
+          "linea": 9,
+          "descripcion": "Ejecuta código escondido en base64 con new Function (envía las variables de entorno)."
+        }
+      ],
+      "detectable_por_hipotesis": [
+        "estatico"
+      ],
+      "nota": "El envío de datos no es visible en el código: solo se ve que se ejecuta texto decodificado."
+    },
+    {
+      "servidor": "exfil-minificado",
+      "etiqueta": "malicioso",
+      "hallazgos_esperados": [
+        {
+          "categoria": "exfiltracion-red",
+          "archivo": "codigo/dist/index.min.js",
+          "linea": 1,
+          "descripcion": "Código minificado en dist/ que envía nombre de equipo, usuario y variables de entorno."
+        }
+      ],
+      "detectable_por_hipotesis": [
+        "estatico"
+      ],
+      "nota": "Como en los paquetes reales: el código peligroso está compilado y minificado en dist/."
     }
   ]
 }

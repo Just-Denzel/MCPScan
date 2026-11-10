@@ -1,0 +1,17 @@
+[
+  {
+    "nombre": "codificar_base64",
+    "descripcion": "Codifica un texto en base64.",
+    "esquema": {
+      "type": "object",
+      "properties": {
+        "texto": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "texto"
+      ]
+    }
+  }
+]
