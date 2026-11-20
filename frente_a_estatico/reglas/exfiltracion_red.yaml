@@ -1,0 +1,213 @@
+rules:
+  - id: exfil-datos-sistema
+    mode: taint
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: Se envían variables de entorno completas o información del sistema por red.
+    metadata:
+      categoria: exfiltracion-red
+    pattern-sources:
+      - patterns:
+          - pattern: process.env
+          - pattern-not-inside: process.env.$KEY
+          - pattern-not-inside: process.env[$KEY]
+      - pattern: $OS.hostname()
+      - pattern: hostname()
+      - pattern: $OS.userInfo(...)
+      - pattern: userInfo(...)
+      - pattern: process.cwd()
+    pattern-sinks:
+      - pattern: fetch(...)
+      - pattern: axios(...)
+      - pattern: axios.$M(...)
+      - pattern: got(...)
+      - pattern: got.$M(...)
+      - pattern: request(...)
+      - pattern: new WebSocket(...)
+      - patterns:
+          - pattern-either:
+              - pattern-inside: |
+                  import $HTTP from "http";
+                  ...
+              - pattern-inside: |
+                  import * as $HTTP from "http";
+                  ...
+              - pattern-inside: |
+                  import $HTTP from "node:http";
+                  ...
+              - pattern-inside: |
+                  import * as $HTTP from "node:http";
+                  ...
+              - pattern-inside: |
+                  import $HTTP from "https";
+                  ...
+              - pattern-inside: |
+                  import * as $HTTP from "https";
+                  ...
+              - pattern-inside: |
+                  import $HTTP from "node:https";
+                  ...
+              - pattern-inside: |
+                  import * as $HTTP from "node:https";
+                  ...
+              - pattern-inside: |
+                  $HTTP = require("http");
+                  ...
+              - pattern-inside: |
+                  $HTTP = require("node:http");
+                  ...
+              - pattern-inside: |
+                  $HTTP = require("https");
+                  ...
+              - pattern-inside: |
+                  $HTTP = require("node:https");
+                  ...
+          - pattern-either:
+              - pattern: $HTTP.request(...)
+              - pattern: $HTTP.get(...)
+              - patterns:
+                  - pattern-inside: |
+                      $REQ = $HTTP.request(...);
+                      ...
+                  - pattern-either:
+                      - pattern: $REQ.write($DATA, ...)
+                      - pattern: $REQ.end($DATA, ...)
+      - patterns:
+          - pattern-either:
+              - pattern-inside: |
+                  import $CLI from "axios";
+                  ...
+              - pattern-inside: |
+                  $CLI = require("axios");
+                  ...
+              - pattern-inside: |
+                  import $CLI from "got";
+                  ...
+              - pattern-inside: |
+                  $CLI = require("got");
+                  ...
+          - pattern-either:
+              - pattern: $CLI(...)
+              - pattern: $CLI.get(...)
+              - pattern: $CLI.post(...)
+              - pattern: $CLI.put(...)
+              - pattern: $CLI.request(...)
+      - patterns:
+          - pattern-either:
+              - pattern-inside: |
+                  import $NET from "net";
+                  ...
+              - pattern-inside: |
+                  import * as $NET from "net";
+                  ...
+              - pattern-inside: |
+                  import $NET from "node:net";
+                  ...
+              - pattern-inside: |
+                  import * as $NET from "node:net";
+                  ...
+              - pattern-inside: |
+                  $NET = require("net");
+                  ...
+              - pattern-inside: |
+                  $NET = require("node:net");
+                  ...
+              - pattern-inside: |
+                  import $NET from "tls";
+                  ...
+              - pattern-inside: |
+                  import * as $NET from "tls";
+                  ...
+              - pattern-inside: |
+                  import $NET from "node:tls";
+                  ...
+              - pattern-inside: |
+                  import * as $NET from "node:tls";
+                  ...
+          - pattern-either:
+              - pattern: $NET.connect(...)
+              - pattern: $NET.createConnection(...)
+      - patterns:
+          - pattern-inside: |
+              $REQ = request(...);
+              ...
+          - pattern-either:
+              - pattern: $REQ.write($DATA, ...)
+              - pattern: $REQ.end($DATA, ...)
+      - patterns:
+          - pattern-inside: |
+              $WS = new WebSocket(...);
+              ...
+          - pattern: $WS.send(...)
+
+  - id: exfil-archivo-sensible-red
+    mode: taint
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: Se lee un archivo sensible y su contenido se envía por red.
+    metadata:
+      categoria: exfiltracion-red
+    pattern-sources:
+      - patterns:
+          - pattern: '"$STR"'
+          - metavariable-regex:
+              metavariable: $STR
+              regex: '(?i)(^|[/\\~])(\.ssh|\.aws|id_rsa|id_ed25519|\.npmrc|\.netrc|\.kube|\.gnupg|\.env(\.[a-z0-9_-]+)?|\.config[/\\](gcloud|gh|kube))($|[/\\])|^/etc/passwd$'
+      - patterns:
+          - pattern: '`...`'
+          - pattern-regex: '(?i)([/\\~](\.ssh|\.aws|id_rsa|id_ed25519|\.npmrc|\.netrc|\.kube|\.gnupg|\.env\b|\.config[/\\](gcloud|gh|kube))|/etc/passwd)'
+    pattern-sinks:
+      - pattern: fetch(...)
+      - pattern: axios(...)
+      - pattern: axios.$M(...)
+      - pattern: got(...)
+      - pattern: got.$M(...)
+      - pattern: request(...)
+      - patterns:
+          - pattern-either:
+              - pattern-inside: |
+                  import $HTTP from "http";
+                  ...
+              - pattern-inside: |
+                  import * as $HTTP from "http";
+                  ...
+              - pattern-inside: |
+                  import $HTTP from "node:http";
+                  ...
+              - pattern-inside: |
+                  import * as $HTTP from "node:http";
+                  ...
+              - pattern-inside: |
+                  import $HTTP from "https";
+                  ...
+              - pattern-inside: |
+                  import * as $HTTP from "https";
+                  ...
+              - pattern-inside: |
+                  import $HTTP from "node:https";
+                  ...
+              - pattern-inside: |
+                  import * as $HTTP from "node:https";
+                  ...
+              - pattern-inside: |
+                  $HTTP = require("http");
+                  ...
+              - pattern-inside: |
+                  $HTTP = require("node:http");
+                  ...
+              - pattern-inside: |
+                  $HTTP = require("https");
+                  ...
+              - pattern-inside: |
+                  $HTTP = require("node:https");
+                  ...
+          - pattern-either:
+              - pattern: $HTTP.request(...)
+              - pattern: $HTTP.get(...)
+              - patterns:
+                  - pattern-inside: |
+                      $REQ = $HTTP.request(...);
+                      ...
+                  - pattern-either:
+                      - pattern: $REQ.write($DATA, ...)
+                      - pattern: $REQ.end($DATA, ...)
