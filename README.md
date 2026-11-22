@@ -5,7 +5,7 @@ Herramienta que analiza servidores MCP públicos y entrega un reporte de riesgo 
 - **Código del servidor** (frente A): ejecución de comandos con datos del modelo, lectura de archivos sensibles, envío de datos a dominios externos, secretos hardcodeados, dependencias sospechosas y scripts de instalación.
 - **Descripciones de las herramientas** (frente B): *tool poisoning*, es decir, instrucciones ocultas dirigidas al modelo dentro del texto que describe una herramienta.
 
-Proyecto final del curso de seguridad (PUC Chile, 2026-2). Entrega del informe y el código: 19 de noviembre de 2026.
+Proyecto final del curso de seguridad (PUC Chile, 2026-2). Entrega del informe y el código: 24 de noviembre de 2026.
 
 **Integrantes:** Mario Rojas, Mauricio Pino, Fernando García.
 
