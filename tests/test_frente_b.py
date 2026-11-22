@@ -1,11 +1,13 @@
-"""Frente B: heurísticas de tool poisoning."""
+"""Frente B: heurísticas y extractor de herramientas."""
 import json
+import shutil
 from pathlib import Path
 
 import pytest
 
 from frente_b_descripciones import heuristicas
-from frente_b_descripciones.herramientas import textos
+from frente_b_descripciones.extractor import MARCADOR, decodificar, estado, extraer, tokenizar
+from frente_b_descripciones.herramientas import cargar, textos
 
 RAIZ = Path(__file__).resolve().parent.parent
 BANCO = RAIZ / "corpus/banco_de_pruebas"
@@ -96,3 +98,83 @@ def test_textos_incluye_parametros_anidados():
         "a": {"type": "object", "description": "pa", "properties": {"b": {"type": "string", "description": "pb"}}},
         "c": {"type": "array", "items": {"type": "string", "description": "pc"}}}}}
     assert dict(textos(h)) == {"descripcion": "d", "parametro:a": "pa", "parametro:a.b": "pb", "parametro:c[]": "pc"}
+
+
+# ------------------------------------------------------------------------------------------ extractor
+
+def test_extractor_reproduce_el_banco():
+    for d in sorted(BANCO.iterdir()):
+        if not (d / "manifest.json").exists():
+            continue
+        esperado = json.loads((d / "herramientas.json").read_text(encoding="utf-8"))
+        obtenido = [{k: h[k] for k in ("nombre", "descripcion", "esquema")} for h in extraer(d)]
+        assert obtenido == esperado, d.name
+
+
+def _paquete(tmp_path: Path, archivos: dict) -> Path:
+    d = tmp_path / "srv"
+    for ruta, contenido in archivos.items():
+        f = d / "codigo" / ruta
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text(contenido, encoding="utf-8")
+    (d / "manifest.json").write_text('{"fuente": "npm"}', encoding="utf-8")
+    return d
+
+
+def test_extractor_patrones(tmp_path):
+    d = _paquete(tmp_path, {
+        "dist/desc.js": 'export const LARGA = ["Primera línea.", "Segunda línea."].join(" ");\n',
+        "dist/index.js": r'''
+import { LARGA } from "./desc.js";
+const z = require("zod");
+const PREFIJO = "Busca";
+server.registerTool("buscar", {
+  title: "Buscar",
+  description: `${PREFIJO} en la web. ` + LARGA,
+  inputSchema: { q: z.string().describe("Consulta"), n: z.number().optional() },
+}, async ({ q }) => ({ content: [] }));
+server.tool("hora", "Devuelve la hora\u{E0049}", { zona: z.string() }, { readOnlyHint: true }, async () => ({}));
+server.tool("sin_desc", { a: z.number() }, async () => ({}));
+const tools=[{name:"listar",description:"Lista "+process.env.X+" cosas",inputSchema:{type:"object",properties:{p:{type:"string",description:"Ruta"}},required:["p"]}}];
+reg("envuelta", { description: dedent`
+    Texto con sangría.
+  `, inputSchema: { x: z.string() } });
+class S { registerTool(name, config, cb) { return name; } }
+''',
+        "test/ignorar.test.js": 'server.tool("no_va", "de un test", async () => ({}));',
+    })
+    hs = {h["nombre"]: h for h in extraer(d)}
+    assert set(hs) == {"buscar", "hora", "sin_desc", "listar", "envuelta"}
+    b = hs["buscar"]
+    assert b["descripcion"] == "Busca en la web. Primera línea. Segunda línea."
+    assert b["titulo"] == "Buscar" and b["origen"] == "codigo/dist/index.js:5"
+    assert b["esquema"] == {"type": "object", "properties": {"q": {"type": "string", "description": "Consulta"},
+                                                              "n": {"type": "number"}}, "required": ["q"]}
+    assert hs["hora"]["descripcion"] == "Devuelve la hora\U000e0049"
+    assert hs["hora"]["esquema"]["properties"] == {"zona": {"type": "string"}}
+    assert hs["sin_desc"]["esquema"]["properties"] == {"a": {"type": "number"}}
+    assert hs["listar"]["descripcion"] == f"Lista {MARCADOR} cosas" and estado(hs["listar"]) == "parcial"
+    assert hs["listar"]["esquema"]["properties"]["p"]["description"] == "Ruta"
+    assert hs["envuelta"]["descripcion"] == "Texto con sangría."
+
+
+def test_extractor_mapa_de_descripciones(tmp_path):
+    d = _paquete(tmp_path, {
+        "descripciones.js": 'export const DESC = { uno: "Hace uno.", dos: "Hace " + "dos." };',
+        "index.js": 'server.registerTool("uno", { inputSchema: {} }, f);\nserver.registerTool("dos", {}, f);',
+    })
+    assert {h["nombre"]: h["descripcion"] for h in extraer(d)} == {"uno": "Hace uno.", "dos": "Hace dos."}
+
+
+def test_tokenizador_regex_plantillas_y_escapes():
+    toks, _, _ = tokenizar('const r = /"no es texto/g; const t = `a ${b + "}"} c`; x = "\\u200b\\uDB40\\uDC49";')
+    assert [t.t for t in toks if t.t in ("re", "tpl", "str")] == ["re", "tpl", "str"]
+    assert decodificar(r"󠁉\x41\u{1F600}") == "\U000e0049A\U0001F600"
+
+
+def test_cargar_extrae_si_no_hay_herramientas_json(tmp_path):
+    d = tmp_path / "copia"
+    shutil.copytree(BANCO / "poison-parametro", d)
+    (d / "herramientas.json").unlink()
+    assert [h["nombre"] for h in cargar(d)] == ["traducir"]
+    assert {h["categoria"] for h in heuristicas.analizar(d)} == {"tool-poisoning-instruccion"}

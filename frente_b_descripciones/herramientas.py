@@ -3,7 +3,8 @@
 Lo usan las heurísticas y el clasificador LLM, para que las dos técnicas vean exactamente
 los mismos textos:
 
-- cargar(dir_servidor): la lista de herramientas de <servidor>/herramientas.json.
+- cargar(dir_servidor): la lista de herramientas de <servidor>/herramientas.json. Si el servidor
+  no lo trae (los reales de npm), se extraen del código con extractor.py, sin ejecutarlo.
 - textos(herramienta): cada texto que lee el modelo, con dónde está: la descripción de la
   herramienta y la de cada parámetro (esquema.properties.<p>.description), también anidados.
 - ubicacion(dir_servidor, herramienta, donde): el campo "ubicacion" del hallazgo.
@@ -17,11 +18,20 @@ _SUBESQUEMAS_LISTA = ("anyOf", "oneOf", "allOf", "prefixItems")
 _SUBESQUEMAS_UNO = ("items", "additionalProperties", "not")
 
 
+_EXTRAIDAS: dict[str, list[dict]] = {}
+
+
 def cargar(dir_servidor: Path) -> list[dict]:
-    """Herramientas del servidor (lista vacía si no hay herramientas.json o está mal formado)."""
+    """Herramientas del servidor: herramientas.json o, si no existe, las extraídas del código."""
     f = Path(dir_servidor) / "herramientas.json"
     if not f.exists():
-        return []
+        if not (Path(dir_servidor) / "codigo").is_dir():
+            return []
+        clave = str(Path(dir_servidor).resolve())
+        if clave not in _EXTRAIDAS:  # las dos técnicas leen lo mismo: se extrae una vez por corrida
+            from frente_b_descripciones.extractor import extraer
+            _EXTRAIDAS[clave] = extraer(Path(dir_servidor))
+        return _EXTRAIDAS[clave]
     try:
         datos = json.loads(f.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, UnicodeDecodeError):
