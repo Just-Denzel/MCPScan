@@ -1,8 +1,11 @@
 rules:
   - id: exec-comando-dinamico
     languages: [typescript, javascript]
-    severity: ERROR
-    message: Se ejecuta un comando de shell construido dinámicamente; si incluye datos del modelo hay command injection.
+    # WARNING (media): marca cualquier comando armado con variables. Es una POSIBLE inyección;
+    # no prueba que el dato venga del modelo. En servidores reales requiere revisión manual.
+    # La inyección confirmada la entrega el sandbox (regla inyeccion-confirmada, severidad alta).
+    severity: WARNING
+    message: Se ejecuta un comando de shell construido dinámicamente (posible command injection si incluye datos del modelo).
     metadata:
       categoria: ejecucion-de-comando
     patterns:

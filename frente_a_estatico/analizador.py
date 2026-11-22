@@ -96,7 +96,7 @@ def _semgrep(dir_servidor: Path) -> list[dict]:
         if r.returncode not in (0, 1) or not r.stdout.strip():
             raise RuntimeError(f"Semgrep falló (código {r.returncode}): {r.stderr.strip()[-300:]}")
         datos = json.loads(r.stdout)
-    for res in datos.get("results", []):
+        for res in datos.get("results", []):
             regla = res["check_id"].split(".")[-1]
             categoria = res["extra"].get("metadata", {}).get("categoria", regla)
             ruta = Path(res["path"]).resolve().relative_to(base).as_posix()

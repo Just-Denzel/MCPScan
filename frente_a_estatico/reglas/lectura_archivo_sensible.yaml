@@ -44,10 +44,10 @@ rules:
               regex: '(?i)(^|[/\\~])(\.ssh|\.aws|id_rsa|id_ed25519|\.npmrc|\.netrc|\.kube|\.gnupg|\.config[/\\](gcloud|gh|kube)|Login Data|key4\.db)($|[/\\])|^/etc/(passwd|shadow)$'
       - patterns:
           - pattern-either:
-              - pattern: '$PATH.join($HOME, ..., ".env", ...)'
-              - pattern: '$PATH.resolve($HOME, ..., ".env", ...)'
-              - pattern: 'join($HOME, ..., ".env", ...)'
-              - pattern: 'resolve($HOME, ..., ".env", ...)'
+              - pattern: '$PATH.join($HOME, ".env", ...)'
+              - pattern: '$PATH.resolve($HOME, ".env", ...)'
+              - pattern: 'join($HOME, ".env", ...)'
+              - pattern: 'resolve($HOME, ".env", ...)'
           - metavariable-regex:
               metavariable: $HOME
               regex: '(?i)(homedir|HOME|USERPROFILE)'
@@ -55,4 +55,4 @@ rules:
           - pattern-either:
               - pattern: '$A + "$B"'
               - pattern: '`...`'
-          - pattern-regex: '(?i)([/\\~](\.ssh|\.aws|\.npmrc|\.netrc|\.kube|\.gnupg|\.config[/\\](gcloud|gh|kube)|id_rsa|id_ed25519)|/etc/passwd|/etc/shadow|(~[/\\]|homedir\(\))[^\n`"]*\.env\b)'
+          - pattern-regex: '(?i)([/\\~](\.ssh|\.aws|\.npmrc|\.netrc|\.kube|\.gnupg|\.config[/\\](gcloud|gh|kube)|id_rsa|id_ed25519)|/etc/passwd|/etc/shadow|(~|homedir\(\)\}?)[/\\]\.env\b)'

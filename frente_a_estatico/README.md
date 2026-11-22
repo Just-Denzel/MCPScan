@@ -25,21 +25,31 @@ rules:
 
 Si Semgrep falla, el analizador lanza un error en vez de devolver una lista vacía, y el pipeline lo registra. Así un fallo no se confunde con "no hay hallazgos".
 
-## Qué falta
+## Estado
 
-| Categoría | Cómo detectarla | Estado |
+Las 7 categorías del frente están implementadas:
+
+| Categoría | Cómo se detecta | Dónde |
 | --- | --- | --- |
-| `ejecucion-de-comando` | Regla Semgrep | Hecha (versión simple) |
-| `exfiltracion-red` | Semgrep: `fetch(...)` o `http.request(...)` con `process.env` completo o datos del usuario | Falta |
-| `lectura-archivo-sensible` | Semgrep: `fs.readFileSync` sobre rutas con `.ssh`, `.aws`, `.env` | Falta |
-| `secreto-hardcodeado` | gitleaks, o reglas de Semgrep para secretos | Falta |
-| `dependencia-typosquat` | Python: comparar nombres de `package.json` con los paquetes populares de npm | Falta |
-| `script-instalacion` | Python: leer `scripts` de `package.json` | Falta |
-| `codigo-ofuscado` | Semgrep: `eval`, `new Function`, `vm.*` sobre texto decodificado (base64, códigos de caracteres) | Falta |
+| `ejecucion-de-comando` | Semgrep: `exec`/`execSync` con comando dinámico, `spawn`/`execFile` con `shell: true`, shells explícitas | `reglas/ejecucion-de-comando.yml` |
+| `exfiltracion-red` | Semgrep *taint*: `process.env`, `hostname()`, `userInfo()` o archivos sensibles que llegan a `fetch`, `http(s)`, `axios`, `got`, sockets | `reglas/exfiltracion_red.yaml` |
+| `lectura-archivo-sensible` | Semgrep *taint* y rutas construidas hacia `.ssh`, `.aws`, `.npmrc`, `.netrc`, `~/.env`… | `reglas/lectura_archivo_sensible.yaml` |
+| `codigo-ofuscado` | Semgrep *taint*: base64, hex, `fromCharCode`… que llegan a `eval`, `new Function`, `vm.*` | `reglas/codigo_ofuscado.yaml` |
+| `secreto-hardcodeado` | Python: patrones de alta confianza (AWS, GitHub, Slack, claves privadas…) | `detectores_python.py` |
+| `dependencia-typosquat` | Python: distancia de edición contra una lista de paquetes populares | `detectores_python.py` |
+| `script-instalacion` | Python: `preinstall`, `install`, `postinstall` (severidad alta si sale a la red o ejecuta código) | `detectores_python.py` |
 
-Qué cuenta en cada categoría y en qué variantes puede aparecer está en **[docs/categorias.md](../docs/categorias.md)**. Escriban las reglas contra esa especificación: al final se evalúan también contra un conjunto de validación con variantes que no están en el banco.
+Resultados (21 de noviembre de 2026):
 
-La regla de `ejecucion-de-comando` es simple a propósito. Una mejora importante es pasarla a modo **taint**, que sigue un valor desde el parámetro de una herramienta MCP hasta `exec`. Eso la hace específica de MCP.
+| Conjunto | Precisión | Recall del frente A | Benignos marcados |
+| --- | --- | --- | --- |
+| Desarrollo | 1,00 | 9 de 9 | 0 de 6 |
+| Validación privada | 1,00 | 8 de 8 | 0 de 3 |
+
+### Para el informe
+
+- `exec-comando-dinamico` tiene severidad **media**: marca cualquier comando armado con variables, lo que es riesgo pero no prueba que el dato venga del modelo. En servidores reales estos hallazgos se revisan a mano y se reportan como *posible* inyección. La inyección **confirmada** la entrega el sandbox (`inyeccion-confirmada`, severidad alta).
+- `.env` se considera sensible en el proyecto o directamente en el home (`~/.env`), no dentro de la carpeta de configuración propia de una app (`~/.miapp/.env`), según `docs/categorias.md`.
 
 ## Cuidado con los falsos positivos
 
