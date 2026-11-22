@@ -1,0 +1,707 @@
+{
+  "descripcion": "Muestra de servidores MCP de npm analizada en MCPScan. Se reproduce con: python frente_a_estatico/recolectar.py corpus/real --desde-muestra corpus/muestra_real.json",
+  "fecha_descarga": "2026-11-22",
+  "fuente": "registry oficial de MCP + npm",
+  "servidores": [
+    {
+      "paquete": "@402mcp/mcp",
+      "version": "1.1.1",
+      "integridad": "sha512-KegwA7nsYdByc7SCk8ziKrOnHNRFRHcTWx1hgzRSg7CYd45ji+LDiCd2emUAQFTrNiiMX9w9Wa9iAcU/2/7S9Q==",
+      "repositorio": "https://github.com/402MCP/402mcp",
+      "nombre_registro": "org.402mcp/registry"
+    },
+    {
+      "paquete": "a2ald",
+      "version": "0.2.7",
+      "integridad": "sha512-YLZaKJ7nQXfvlRfE0Dc6/8Sim4ng1rn4DvKmS9Fyn/IgBhFREHfeSizxoopP584IJzNKdxAZ7MlCJjESlmxGSQ==",
+      "repositorio": "https://github.com/a2al/a2al",
+      "nombre_registro": "io.github.a2al/a2ald"
+    },
+    {
+      "paquete": "actas",
+      "version": "0.9.1",
+      "integridad": "sha512-dESDLTX8+GTR/i/JwjNmkW4zNcn2OZbhWbv4WRXN8c9MEnHsotVHSFVEg7v7ZmmTJtr5+/4ugVvqaTBvZqOo4Q==",
+      "repositorio": null,
+      "nombre_registro": "dev.actas/accounts"
+    },
+    {
+      "paquete": "addressintel-mcp",
+      "version": "1.1.2",
+      "integridad": "sha512-ygV4IET3o+tYOmugdX6OCVFa3WYjxUmT959mNczvIXTdcm3nlmCQHu2RHMrk1s/cNuv85tDScUDPHkYfBa0/aA==",
+      "repositorio": "https://github.com/RantumBits/addressintel-mcp",
+      "nombre_registro": "co.addressintel/permits"
+    },
+    {
+      "paquete": "@aetherwealth/mcp",
+      "version": "0.2.17",
+      "integridad": "sha512-f0QHsof/5vTLwG0EQh1iHAnOqtlUTCZQ4ndcqX5Nr8ONj3/QSUwTRUTAA64byJlfMP9kwPoOs+ixIceAgLIUbw==",
+      "repositorio": null,
+      "nombre_registro": "ai.aetherwealth/mcp"
+    },
+    {
+      "paquete": "@aetherya/mcp",
+      "version": "1.0.5",
+      "integridad": "sha512-uGE1iFoLJJ4vTWyYNRLGSzvEvmShOgQrWW3wAiO9+1nm7FPhA9ohbc/Qyma6+0Z6+KG0mxBOgWqzz4fweJgtGA==",
+      "repositorio": null,
+      "nombre_registro": "ai.aetherya/mcp"
+    },
+    {
+      "paquete": "agent-intercom",
+      "version": "0.2.5",
+      "integridad": "sha512-UBANxz1GtD5Lz6Rl7DC7YiVNMlK2rFHWbzy82cP2T4lHtK5j1rmwfHChEhwBbxCW4UwOFWhD2fI27XGS3K4CGQ==",
+      "repositorio": "https://github.com/iambashar/agent-intercom",
+      "nombre_registro": "io.github.iambashar/agent-intercom"
+    },
+    {
+      "paquete": "agentsbase-mcp",
+      "version": "1.0.1",
+      "integridad": "sha512-C9oZlzZBTa1ISiSXsd5KGAfLXts0gjIeaIwPR0/tDhiGWp6nvnNFElnE2ul/pyVgSvQvFNyiEEezLuf4LxoJ+Q==",
+      "repositorio": null,
+      "nombre_registro": "net.agentsbase/mcp"
+    },
+    {
+      "paquete": "@agentsignalnet/mcp",
+      "version": "0.2.74",
+      "integridad": "sha512-3WqcSoOh/wd51eRcMhRH8c24UirhyPzKI69jyz9cwzxitqRtbCbt+gcWZ+aZIf0ZQGfMA8ia1qZv6JrccnJOpQ==",
+      "repositorio": "https://github.com/Data-Group-AI/agentsignal",
+      "nombre_registro": "net.agentsignal/mcp"
+    },
+    {
+      "paquete": "@agentutil/context-mcp",
+      "version": "1.0.0",
+      "integridad": "sha512-4A3R8kR5SpAetR5NChsGenkjHZNPX2BwpPk635yM1hVaxyr9HAuoaYpc8oqM39qHhuTnf+bVXUT2pcvRxCfalw==",
+      "repositorio": null,
+      "nombre_registro": "net.agentutil/context-mcp"
+    },
+    {
+      "paquete": "@agentutil/think-mcp",
+      "version": "1.0.0",
+      "integridad": "sha512-tzpmdJXOVBD3FCVJQveOjEm2KsyMLovOOwgcU80hZ0Z6VVXAe0KWeknWrUA0/016by2mEJoH/YUh/K6bT6tAhA==",
+      "repositorio": null,
+      "nombre_registro": "net.agentutil/think-mcp"
+    },
+    {
+      "paquete": "@agentutil/verify-mcp",
+      "version": "1.0.0",
+      "integridad": "sha512-1cK756LVPYYrXq3yMcj9ciBIrOvnisyH5r1TT2C8H4S9UC/IBJ4x2mjOeotUK+9IKcThqmkmyIMPCUYNrYV+Qg==",
+      "repositorio": null,
+      "nombre_registro": "net.agentutil/verify-mcp"
+    },
+    {
+      "paquete": "ai-l10n-mcp",
+      "version": "1.2.2",
+      "integridad": "sha512-UQHg+LEuSA1iFkkLL7AZdeYYid1FCiBsfamaeU2GaP2bo6Mqlig9Embl/u3LJP6rG+j4UKIfaem54UdDztuInQ==",
+      "repositorio": "https://github.com/l10n-dev/ai-l10n",
+      "nombre_registro": "io.github.l10n-dev/ai-l10n-mcp"
+    },
+    {
+      "paquete": "aicost-mcp",
+      "version": "1.3.0",
+      "integridad": "sha512-5uQfqYp4GC+wLVJ0x1R49nbjuYjxJTLZVK4Kzo6S/YDJ0zwOMFJqCDGhJeCgce8lJv87RMq1fOQZJmXnkqaUEg==",
+      "repositorio": "https://github.com/ufhouck/aicost",
+      "nombre_registro": "io.github.ufhouck/aicost-cli"
+    },
+    {
+      "paquete": "api-sorties-mcp",
+      "version": "0.1.1",
+      "integridad": "sha512-9R2hNECTLWMFqHArTnZ0K/oohJQcCPSzwiIHQjUHWIjuWpSTXu/ZuLMFUL+O+hCzehpmvsLO4kEH2X7d1EvbTw==",
+      "repositorio": null,
+      "nombre_registro": "io.github.mabari2505/api-sorties-mcp"
+    },
+    {
+      "paquete": "@appscreen/mcp",
+      "version": "0.30.0",
+      "integridad": "sha512-xsDD6D8xW+rEGdUyukDUME2j8CrTcK61GXfvGlyr/Dz2go+5/meQo86jWm4AVxJ5bjhxGZSZE4tAbh01LtwxlQ==",
+      "repositorio": "https://github.com/omelas-tech/appscreen-mcp",
+      "nombre_registro": "co.appscreen/mcp"
+    },
+    {
+      "paquete": "@atlassian-dc-mcp/bitbucket",
+      "version": "0.43.1",
+      "integridad": "sha512-vEQwHAETTcMdNUiHVFx3hTqPg6f7en00afDgQAShfTIZZ4q4VY9gNO3242C1zJkIg9BeNkuGUHcan4opmoq3DQ==",
+      "repositorio": "https://github.com/b1ff/atlassian-dc-mcp",
+      "nombre_registro": "io.github.b1ff/atlassian-dc-mcp-bitbucket"
+    },
+    {
+      "paquete": "@benchboss/mcp-client",
+      "version": "0.3.1",
+      "integridad": "sha512-dwCURgZDElsxxKvxeWekDITevu9L+ZwDIALidcS6HR6veZryxZ7qjoGwiy5gcdAdNkgPZFgZdYU9sDG195kYSg==",
+      "repositorio": null,
+      "nombre_registro": "io.github.p4stoboy/benchboss"
+    },
+    {
+      "paquete": "bgremover-mcp",
+      "version": "0.1.0",
+      "integridad": "sha512-zf76hN4JQI0n5maqgF1QZXzReZv/QCx4D85g/XxJWhiKjHKi6kitLePPHaTcOP0yUEmJ2ZQCVegp+/VNvfRTBA==",
+      "repositorio": "https://github.com/j-river/bgremover-mcp",
+      "nombre_registro": "io.github.j-river/bgremover"
+    },
+    {
+      "paquete": "@br-ai-n/mcp-icon-visual",
+      "version": "0.1.1",
+      "integridad": "sha512-S2MfxmEhoO7X/wWqsQnKO+2zc0XX0qFkksIfCH4Etrp3q82yMzdG9p7Gz1Vy2lNB5TYjUCSKlS8utO0ovnMN9g==",
+      "repositorio": "https://github.com/n0isy/brain-mcp-icon-visual",
+      "nombre_registro": "io.github.n0isy/mcp-icon-visual"
+    },
+    {
+      "paquete": "@burtthecoder/mcp-shodan",
+      "version": "1.0.41",
+      "integridad": "sha512-Iz1YIFck3Os/7znrAvNHtnwNB2qtLZrQMR3YEnHOrtefYLw4Aci64n2LP1S2KvS5pESYKxtYDsD/5tYXdkaNFQ==",
+      "repositorio": "https://github.com/w0h1v/mcp-shodan",
+      "nombre_registro": "io.github.w0h1v/shodan"
+    },
+    {
+      "paquete": "@caelaralabs/shield-mcp",
+      "version": "1.1.0",
+      "integridad": "sha512-77htF0VgW8rMknPhorFBCxOeeGzcKBiaLbhmgzO/jFbR8qcUUPtypu7EsbCxXMkqFjqzR6HW7kj5qU7AvdTsGg==",
+      "repositorio": "https://github.com/kingefman1-cmyk/shield-mcp",
+      "nombre_registro": "com.caelaralabs/shield"
+    },
+    {
+      "paquete": "calculiva-mcp",
+      "version": "0.2.0",
+      "integridad": "sha512-lZu2dt1/3y9hyFh+GvyTGk49Deq5dKVfsiGjrg9ZZOTxB+nmy432NzssfrK4+qw5/9gyAk7M+ATF/ovR7RQCWw==",
+      "repositorio": null,
+      "nombre_registro": "com.calculiva/cut-planner"
+    },
+    {
+      "paquete": "chirak-mcp",
+      "version": "1.1.2",
+      "integridad": "sha512-sdY6a0U14q8bYl2KUWrJzz2VaK6h2FhUfFV7nVztt+9TmsC+fUX0jFtrBMGQtPvPNqEP6bJZULP2AESobZht2A==",
+      "repositorio": "https://github.com/ufhouck/chirak-mcp",
+      "nombre_registro": "io.github.ufhouck/chirak-mcp"
+    },
+    {
+      "paquete": "codefizz-editor-agent",
+      "version": "3.27.2",
+      "integridad": "sha512-X05YRr8LmY+l7cl4nkVjb+GDZ6p/Wq00b4R60+hiIbADYVP9/Ofsb2m3lO1oxCahrIWHfMlY/DdQe/EUwlhgKg==",
+      "repositorio": null,
+      "nombre_registro": "io.github.aadeshrao123/codefizz-editor-agent"
+    },
+    {
+      "paquete": "cricketstudio-mcp",
+      "version": "1.0.2",
+      "integridad": "sha512-Yy0EG+carYA2vEs+VXJs16RBnCAQ/XBJ81OKTrfi7iN8JfX1ovm6jXxDp2tohjlzYUMrEKrBSLQJQ6JJ6ZnyLw==",
+      "repositorio": "https://github.com/i-m-arul/cricketstudio-mcp",
+      "nombre_registro": "io.github.i-m-arul/cricketstudio-mcp"
+    },
+    {
+      "paquete": "cryptoiz-mcp",
+      "version": "4.16.17",
+      "integridad": "sha512-xU2JYgxL+FPqF/V0NUXsoEC/riSCcWTEUWWKaCqp0eMzRoBzLQb5twnQ0oxDJ2py/ed76d1Zkdda9vXlwCyc6A==",
+      "repositorio": "https://github.com/dadang11/cryptoiz-mcp",
+      "nombre_registro": "io.github.dadang11/cryptoiz"
+    },
+    {
+      "paquete": "cssgraph",
+      "version": "0.6.3",
+      "integridad": "sha512-0FP/GfzLH+kX1iVUYZmVWJT451qUUH1CrJIeJWwsOFSgKRd9lF7YkPqa7Gb2zOrax3K9KTfdtQIrzvnRMUkzKg==",
+      "repositorio": "https://github.com/mack-peng/cssgraph",
+      "nombre_registro": "io.github.mack-peng/cssgraph"
+    },
+    {
+      "paquete": "cssprobe-cli",
+      "version": "0.3.0",
+      "integridad": "sha512-xCG+pW3c1KkJ+OSe7t6GvhHd9RLpPfun+abGpYT/XtEg3Y7pPw6F1S9w5oie/WDlH6Uu/AjNF/xVXqyX+6pUag==",
+      "repositorio": "https://github.com/mack-peng/cssprobe-cli",
+      "nombre_registro": "io.github.mack-peng/cssprobe-cli"
+    },
+    {
+      "paquete": "cursor-telegram-chat",
+      "version": "0.1.23",
+      "integridad": "sha512-wTrvGCzXzs3qmIdbDMiiGDWHa5lJ2LGIbrwGhg+XDsHOmcmmtm0SI96i58UdNj23WbzDuCEnUJoQ4GgdnPNXng==",
+      "repositorio": "https://github.com/udah1/cursor-chat-bridge",
+      "nombre_registro": "io.github.udah1/cursor-chat-bridge"
+    },
+    {
+      "paquete": "@daanielcruz/gsearch-mcp",
+      "version": "1.2.3",
+      "integridad": "sha512-hSdqW7bTv3RIfhLL9XLkCrfOSJb/BJbhunUUyk6c3CxmDJZIojAQGbVC84kNMiiMLccykU/jDb6qPCG3Cl5gUQ==",
+      "repositorio": "https://github.com/daanielcruz/gsearch-mcp",
+      "nombre_registro": "io.github.daanielcruz/gsearch"
+    },
+    {
+      "paquete": "@dashclaw/mcp-server",
+      "version": "3.1.6",
+      "integridad": "sha512-fgjtHgWTsAHoCsy4pzDA4iC8YfD+nHmwBIJ6U7RSRZHfa8jf+7NWn2sNaZAwulOEjc7e9hwxQEuvXEMECOt2eQ==",
+      "repositorio": "https://github.com/ucsandman/DashClaw",
+      "nombre_registro": "io.github.ucsandman/dashclaw"
+    },
+    {
+      "paquete": "@dbx-app/mcp-server",
+      "version": "0.1.3",
+      "integridad": "sha512-HJLUx65MJdtHdbRtLNkzmA+paDYk3Mlthw7j/4DqaMf5EN3uYlMozlDgLwTdTb13WI2sIk8vuszlPpBLWJhyPQ==",
+      "repositorio": "https://github.com/t8y2/dbx",
+      "nombre_registro": "io.github.t8y2/dbx"
+    },
+    {
+      "paquete": "decoy-mcp-server",
+      "version": "1.7.0",
+      "integridad": "sha512-8op8J1EzxDKOddp+EApfaYC6xS/mHJrAmYrtHWn1Tsg3kVx6M/nocSOBx32qczMcsXeWV4lbhu10lkYmYf2HZw==",
+      "repositorio": "https://github.com/decoy-identity/decoy-mcp-server",
+      "nombre_registro": "me.decoys/decoy"
+    },
+    {
+      "paquete": "@denik.me/mcp",
+      "version": "0.16.0",
+      "integridad": "sha512-+7nn1zTj8WRI8AmH9QtVqrgXM9cwEoq3PLj2CqbJ5Rfs/yBOLeYlkgDb1kNEuqlUIGJVb2g8EYAUYKHlJmkkXA==",
+      "repositorio": null,
+      "nombre_registro": "me.denik/denik"
+    },
+    {
+      "paquete": "dj-claude",
+      "version": "0.1.6",
+      "integridad": "sha512-E+V3a3ARMQ30ylqqZ0fIAMZWh1Ie51ZbK7c1ut+Ho7ZkMecrleFz4CE0BvDJebN9uUCXv4/Bx57c9LQsxMIeQA==",
+      "repositorio": "https://github.com/p-poss/dj-claude",
+      "nombre_registro": "io.github.p-poss/dj-claude"
+    },
+    {
+      "paquete": "@droidagentkit/launcher",
+      "version": "0.3.2-alpha",
+      "integridad": "sha512-REZ9Kjnsv6m2R8XXgqO4k4h+A0S1BrQr+tNzsmHUMjT2lMoUQdMRUCEwwKPwcb72iZ1586NV4UN2nXFYSwTUgg==",
+      "repositorio": "https://github.com/iVamsi/droid-agent-kit",
+      "nombre_registro": "io.github.iVamsi/android-agent-kit"
+    },
+    {
+      "paquete": "e2e",
+      "version": "0.24.0",
+      "integridad": "sha512-hDM22qWiRzlBnJJRDs9vbBfJM8X3KK5xFTj5S/bdYcI7An1BHD6pvcpkd/t1+Ysg8U56ygqVr46vEIN0vW3wKg==",
+      "repositorio": "https://github.com/e2e-inc/e2e",
+      "nombre_registro": "io.github.e2e-inc/e2e"
+    },
+    {
+      "paquete": "@ellul-estate/cafmlane-com-cafmlane-tools-mcp",
+      "version": "1.0.0",
+      "integridad": "sha512-aMzkngGrYrhTsv070mbxQ4o6BZ2dEg8s0O7Xd1kyV2Vxfs8i6HHgPp86D5tozG1DBpCHk4VaiXNIm4LjT77OLg==",
+      "repositorio": "https://github.com/joeetdev/venture-estate",
+      "nombre_registro": "com.cafmlane/cafmlane-tools"
+    },
+    {
+      "paquete": "elpriser-mcp",
+      "version": "1.1.0",
+      "integridad": "sha512-+gMZBe2NrY2gwTyI3t6FowTcN3CEumftLq2ia67D5+ckbeQB8+ZB3zb/77Zdr/ow8B3404WeqfbDLAvqS2mmEQ==",
+      "repositorio": "https://github.com/x2q/elpriser-mcp",
+      "nombre_registro": "io.github.x2q/elpriser-mcp"
+    },
+    {
+      "paquete": "engram-rs-mcp",
+      "version": "0.10.0",
+      "integridad": "sha512-Zq2lAAnzPC4JC98nh7e/P/NHCOShL7n1NYa+JpQH6GaYNrdltNW9XuH4B895Iiia7O5p5XubFsnMhNVQ+w4v/g==",
+      "repositorio": "https://github.com/kael-bit/engram-rs",
+      "nombre_registro": "io.github.kael-bit/engram"
+    },
+    {
+      "paquete": "@esimfly/mcp",
+      "version": "0.2.0",
+      "integridad": "sha512-8jchtz6rLFG5kCoDMBUE2JU8cJMX6KSLW/YPWRGbTX+xGnAvSi5UOrYzypmLWgYhEdOFeiiKey4rkIjdHqtz7g==",
+      "repositorio": "https://github.com/eSimfly-Official/esimfly-mcp",
+      "nombre_registro": "io.github.eSimfly-Official/esimfly-mcp"
+    },
+    {
+      "paquete": "@essentialai/cc-bridge-mcp-server",
+      "version": "0.3.0",
+      "integridad": "sha512-Eq5cTxZK+0JkbcYk/4Q4dlhAUi1NCxDvVxovgfCujYeTvqFF7BfJgnksTVReypNNDEH1etwUyFePM8Znf7SybQ==",
+      "repositorio": "https://github.com/eaisdevelopment/cc-bridge-mcp-server",
+      "nombre_registro": "io.github.eaisdevelopment/cc-bridge-mcp-server"
+    },
+    {
+      "paquete": "@essentialai/mcp-multi-edit",
+      "version": "0.2.7",
+      "integridad": "sha512-35aM+4ny2MseMrcMc3/A9pfBHrf8GRMpXOE1XifRZK8jDVXppzcQ+M0kFnudSKhcgGFyKRweLN9xrkb1VpbjrA==",
+      "repositorio": "https://github.com/eaisdevelopment/mcp-multi-edit",
+      "nombre_registro": "io.github.eaisdevelopment/mcp-multi-edit"
+    },
+    {
+      "paquete": "gemini-image-studio-mcp",
+      "version": "1.0.2",
+      "integridad": "sha512-2zyw7ECWpogNCOqEzSiAQj4lgfu84Z9aGVE4Np4jHsAXFdneBdnOYFj+LmuIApuslh+T2LFDOMb0E0W6DRY99w==",
+      "repositorio": "https://github.com/udhaykumarbala/gemini-image-studio-mcp",
+      "nombre_registro": "io.github.udhaykumarbala/gemini-image-studio"
+    },
+    {
+      "paquete": "geogebra-mcp",
+      "version": "0.1.2",
+      "integridad": "sha512-4gr5j4CpjQ4bxKFCld57f0nbb7rP9lGU6xKupNJXcE93pyPPvKEqTGBDCKUbuvvpaBtPiXzDYiNLaaoM62N3yQ==",
+      "repositorio": "https://github.com/haison8x/geogebra-mcp",
+      "nombre_registro": "io.github.haison8x/geogebra-mcp"
+    },
+    {
+      "paquete": "@hellouchit/mcp-regulated-ai-compliance",
+      "version": "0.2.3",
+      "integridad": "sha512-4F+GW4AEC+OKvG8tVu2oml2zTGCgYI10djPw3swmNfWomCtG77iQQdnKW7CQ3+IaHv6VQw8ayCrQRLe/1D02DQ==",
+      "repositorio": "https://github.com/uchit/mcp-regulated-ai-compliance",
+      "nombre_registro": "io.github.uchit/mcp-regulated-ai-compliance"
+    },
+    {
+      "paquete": "hilan-mcp",
+      "version": "0.3.2",
+      "integridad": "sha512-ReOTUJlnUYWFwOroLIyTtS1CvOBdflJqsHOmIbY8r+egXOLu9M/KPVU6xJ9qy8MI+BrgLi2lIo9fCF0oVrztgg==",
+      "repositorio": "https://github.com/udah1/hilan-mcp",
+      "nombre_registro": "io.github.udah1/hilan-mcp"
+    },
+    {
+      "paquete": "@iamjrmh/mcpbridge",
+      "version": "1.0.0",
+      "integridad": "sha512-Pl97G+c0/P1JUxz6UBNusByN+w5RodMvQi9OyxuZZ3TqLWM8pAywnYNBGFyRQn9teuabdjzCiPqDqZp58f+bGA==",
+      "repositorio": "https://github.com/iamjrmh/MCPBridge",
+      "nombre_registro": "io.github.iamjrmh/mcpbridge"
+    },
+    {
+      "paquete": "icdwise",
+      "version": "0.1.1",
+      "integridad": "sha512-+WdrWGUL1azCAATK4VmnJcsHxYU1X7IHUul7rlflqxL5x5wEfun6nPGZwWm2KwLwUNAg0mJbSFf2bvIHNVKpbQ==",
+      "repositorio": "https://github.com/qinisolabs/icdwise",
+      "nombre_registro": "io.github.qinisolabs/icdwise"
+    },
+    {
+      "paquete": "intelliboard-mcp",
+      "version": "0.18.1",
+      "integridad": "sha512-AO8NffPck2PoLCs0rew9x41HQWLpxrIs0wrmd1BsYBCjzpO4Yw8OkpMXEJdaY4rJ/5Wc/CrRGTV12QcZR0Z9qw==",
+      "repositorio": "https://github.com/aaglis/intelliboard",
+      "nombre_registro": "io.github.aaglis/intelliboard-mcp"
+    },
+    {
+      "paquete": "issuewatcher-mcp",
+      "version": "0.2.5",
+      "integridad": "sha512-8PJ1DBfyMoyw0G9wVkiO6Ax4KfH/I4ptpGWsFYdr1uGzkxAFeYP2WZqGwtgZYdcoEGJEsTibhUkqWriNK6qy/g==",
+      "repositorio": "https://github.com/mac146/IssueWatcher",
+      "nombre_registro": "io.github.mac146/issuewatcher"
+    },
+    {
+      "paquete": "iterminal-mcp-server",
+      "version": "2.1.0",
+      "integridad": "sha512-9Bo8ccT6LYpqG1DujsXYADRtaplRS+9LBE2LpEfLw3dRlKuLy3IaRdCqMpfhhYJM/IcZFB4GxxdcWYbfK0gbOg==",
+      "repositorio": "https://github.com/iTophua/iterminal",
+      "nombre_registro": "io.github.iTophua/iterminal"
+    },
+    {
+      "paquete": "@j0hanz/cortex-mcp",
+      "version": "1.11.0",
+      "integridad": "sha512-CHJyyj/Y8Le56NAR/DJtiovwcLFWyYHe8GQih7mL39zeielLtpyXymIBO36l6T5u5bX/Lt2o6hcBklRXMcfruw==",
+      "repositorio": "https://github.com/j0hanz/cortex-mcp",
+      "nombre_registro": "io.github.j0hanz/cortex-mcp"
+    },
+    {
+      "paquete": "@kaaustubh/project-memory-mcp",
+      "version": "1.6.0",
+      "integridad": "sha512-HIrdww5H3rdpZfLva/is2dLz1eh1JWpYGN8xVbglBORu9lelDkw7FlMMmKesj4h9c6W33Azpm2tbEZl1Qlnv3g==",
+      "repositorio": "https://github.com/kaaustubh/project-memory-mcp",
+      "nombre_registro": "io.github.kaaustubh/project-memory-mcp"
+    },
+    {
+      "paquete": "@kaditang/agent-wallet-mcp",
+      "version": "0.4.0",
+      "integridad": "sha512-SNk1o+Gvmz7lj8YAziG7WKODlP099hk8AFSDXUqsDNRSVDFoieVCpqn8om6mKYON5/0eLjU3udbObyP2HKKOWw==",
+      "repositorio": "https://github.com/kaditang/agent-wallet-mcp",
+      "nombre_registro": "io.github.kaditang/agent-wallet-mcp"
+    },
+    {
+      "paquete": "@m-sanchez/calibration-explorer-mcp",
+      "version": "0.2.0",
+      "integridad": "sha512-4C4Oe6ex+ZnYoYfN3RNRxWAD+lakVavikfg6315mqMCRb131OmqkjCPaNb/zGF+xOxHH+oh83KSfPykvOz+xcg==",
+      "repositorio": "https://github.com/m-sanchez/calibration-explorer",
+      "nombre_registro": "io.github.m-sanchez/calibration-explorer"
+    },
+    {
+      "paquete": "@macroaxis/api-mcp",
+      "version": "0.3.2",
+      "integridad": "sha512-PuWz4Elb66kBf7aPakrhm+Kaqvo9tMj9ai6HYGKB1nd4LeMIP6pUWyB3jdPz/x+d7843hq/DbHV/NKpFr8gWjg==",
+      "repositorio": null,
+      "nombre_registro": "com.macroaxis/macroaxis-api"
+    },
+    {
+      "paquete": "@madezmedia/acmi-mcp",
+      "version": "1.4.0",
+      "integridad": "sha512-BEvqcSlYoZUvghcGBM6CLAuRni+OzD5qE2ZpGKTvtB+sFtm56t4gsl/hhg4sb1VaoRFfF+/6ZxgWFiDkH/EkEw==",
+      "repositorio": "https://github.com/madezmedia/acmi",
+      "nombre_registro": "io.github.madezmedia/acmi-mcp"
+    },
+    {
+      "paquete": "madjik-mcp-server",
+      "version": "2.0.2",
+      "integridad": "sha512-8xxZLOMOjoLN6u7ArYo401mMWbyQmm9Af6UXJmz87Acyrmz+BVQyh0dHS+3y2pAxqsrgWiBajpdoc228wng6Xg==",
+      "repositorio": "https://github.com/madjik-io/mcp-server",
+      "nombre_registro": "io.github.madjik-io/mcp-server"
+    },
+    {
+      "paquete": "mcp-magnifica-family",
+      "version": "1.0.3",
+      "integridad": "sha512-uR3B8JPi/FKzPW4jW/beKpFeO55IiMPy/MXcXEM4umzmM/6sMPt+LQw1wtRdRrfSe6ttJBRkbuTzwtGvSOCDuA==",
+      "repositorio": "https://github.com/a-church-ai/magnifica-family",
+      "nombre_registro": "io.github.a-church-ai/magnifica-family"
+    },
+    {
+      "paquete": "mcp-osascript",
+      "version": "1.1.3",
+      "integridad": "sha512-6FPAP6gbSf/Sg49Sm5DB0ed7Ryz80UEUHqXyoodiCMA+8cXGGs4wvhdfB6UpvQjXd1oiDgjmmY66OSdgh5nL5A==",
+      "repositorio": "https://github.com/m0rvayne/mcp-osascript",
+      "nombre_registro": "io.github.m0rvayne/mcp-osascript"
+    },
+    {
+      "paquete": "mcp-server-overleaf",
+      "version": "0.4.1",
+      "integridad": "sha512-fPFUFykXxKHSpB0PhQTBSSDgpQFmKgdicMKeibM50q10Ufr9BPzPOCzyaEagcJZpX8Yx4mLlf6iJ8MQn7akJhQ==",
+      "repositorio": "https://github.com/yangzichao/mcp-server-overleaf",
+      "nombre_registro": "io.github.yangzichao/mcp-server-overleaf"
+    },
+    {
+      "paquete": "memory-pulse",
+      "version": "0.18.0",
+      "integridad": "sha512-FXgcF4OxcGpocCVTnruzl2ebUT2EoGe3LZ7Tqqx90wba2vXiJm/C1pptJy+5mITyoJdPEqtk4sSpybVsMcQxSA==",
+      "repositorio": "https://github.com/t-crew/memory-pulse",
+      "nombre_registro": "io.github.t-crew/memory-pulse"
+    },
+    {
+      "paquete": "mintclub-mcp",
+      "version": "0.1.1",
+      "integridad": "sha512-klMs7nYxAxy8cYKWDcvvtT0e12dmojKSmxvQuWH34Vf8Mb6r+06Suwo/JMX904oPNbPvwT3hjJ81eY7lbXWyWw==",
+      "repositorio": "https://github.com/Steemhunt/mint.club-v2-ai",
+      "nombre_registro": "io.github.h1-hunt/mintclub"
+    },
+    {
+      "paquete": "@n0zer0d4y/vulcan-file-ops",
+      "version": "1.3.0",
+      "integridad": "sha512-wdIwClIKtW8Fz73Dn/eDdirx+pjY+czRM4kEKeKeZpm3sgSESoE5dU6/b+GvD0IguMEBsj7v+S28zhEY0yK4/Q==",
+      "repositorio": null,
+      "nombre_registro": "io.github.n0zer0d4y/vulcan-file-ops"
+    },
+    {
+      "paquete": "@nokosanzo/mcp",
+      "version": "0.1.1",
+      "integridad": "sha512-7Y9iUJygcqZel2+CR6SUCnN0UPZGieQWkZz6qYSpfLylLW3B4VM77nFi4svUHeCRdzzGybbVDy6o5rZrc1+Ohg==",
+      "repositorio": null,
+      "nombre_registro": "io.github.c2nprds/nokosanzo"
+    },
+    {
+      "paquete": "@p1va/symbols",
+      "version": "0.0.10",
+      "integridad": "sha512-yO2cDZzg8WzwEPLdVnPb9cicAwM5r4Qpxf5SCqcq3N/5EngI1cO2QCls0V48MK+aurecIIX/CMAcFK4SxoZX0Q==",
+      "repositorio": "https://github.com/p1va/symbols",
+      "nombre_registro": "io.github.p1va/symbols"
+    },
+    {
+      "paquete": "path402",
+      "version": "1.3.2",
+      "integridad": "sha512-Brg60gaMrU5GrLvBYjjFfarYKdqiozfiR78/yBX4wO0Phx0bzyLwAw2hVIfZEM23irktUlo7vzVcKZI6i7u7hQ==",
+      "repositorio": "https://github.com/b0ase/path402",
+      "nombre_registro": "io.github.b0ase/path402"
+    },
+    {
+      "paquete": "pim-mcp",
+      "version": "0.2.0",
+      "integridad": "sha512-YVqn3+pv79ZqhpFurSCRmSUChXTM6xwTQVfQB3OxibMrPlE22o8Apl33SRV6SwzMSo7VXE0KttPAEb9okFXykQ==",
+      "repositorio": "https://github.com/da-the-dev/pim-mcp",
+      "nombre_registro": "io.github.da-the-dev/pim-mcp"
+    },
+    {
+      "paquete": "pretrip-mcp",
+      "version": "1.0.1",
+      "integridad": "sha512-N7+ccOX85iHEaei+fbCPqfMPcUThGTWjIv5dWq6NC5EJ0YOU+QFknX7/KUbZ6jUvdPNNzKoKQMTJRLbGd1IbTA==",
+      "repositorio": null,
+      "nombre_registro": "agency.kesey/pretrip"
+    },
+    {
+      "paquete": "@qinisolabs/bizdays",
+      "version": "0.2.0",
+      "integridad": "sha512-xkMhLdmYh3Y+6sN6Q5w+Tegof+TNQs7tWuplNTMd1hqD4soF2ZdOg5DkUZpbtaC+nSz2LEHiTFTjwW9Wyv72EQ==",
+      "repositorio": "https://github.com/qinisolabs/bizdays",
+      "nombre_registro": "io.github.qinisolabs/bizdays"
+    },
+    {
+      "paquete": "@qinisolabs/qiniso",
+      "version": "0.5.0",
+      "integridad": "sha512-UnmMzlqo0oaIqG1myC/Ma1jpwzA6B/itGyVMDXiiwGSoEoq70frU08Wwum8F9qcPovvN2pak4V5XPl3aMhYmQw==",
+      "repositorio": "https://github.com/qinisolabs/qiniso",
+      "nombre_registro": "io.github.qinisolabs/qiniso"
+    },
+    {
+      "paquete": "@qmediat.io/cursor-mcp",
+      "version": "1.2.3",
+      "integridad": "sha512-hkvOTwa04MnQMqteUjhmFSULG6EIYQuOj6WNAd+3iCi8opV6qyoFlmUi5sL9vd21QReKlNODHpw0Lo8T2SXeRw==",
+      "repositorio": "https://github.com/qmediat/cursor-mcp",
+      "nombre_registro": "io.github.qmediat/cursor-mcp"
+    },
+    {
+      "paquete": "rankgoat",
+      "version": "0.5.1",
+      "integridad": "sha512-kvBzqilzqZJoPzZYN3UNj9Ey9Wzq6eEH65gTk0soI3zEDs/rthzcmDaC0m3ez6RF+VGD9FcS+q2oRLRKKifx1Q==",
+      "repositorio": "https://github.com/madrzak/rankgoat-cli",
+      "nombre_registro": "io.github.madrzak/rankgoat"
+    },
+    {
+      "paquete": "repomix",
+      "version": "1.19.0",
+      "integridad": "sha512-MzzbJjbZ4OmcBDzMFNM41FxtMxQANsEcjnOpJB9X4fYJZVxuU70t3v8rRXwOqSTj9629ZOQqi9k7zEsBCPElSA==",
+      "repositorio": "https://github.com/yamadashy/repomix",
+      "nombre_registro": "io.github.yamadashy/repomix"
+    },
+    {
+      "paquete": "@ripple-ui/mcp",
+      "version": "0.1.0",
+      "integridad": "sha512-KZtN3CDdhiwmU3xnAzJZs+X9tL4dG46SW76R3rFrSwabgRHGuUVjXqMR8cKwrgm9jwW0Qh+ECuI4cO6H9NTIKg==",
+      "repositorio": "https://github.com/qbtrix/ripple",
+      "nombre_registro": "io.github.qbtrix/ripple"
+    },
+    {
+      "paquete": "saagar-operant-mcp",
+      "version": "0.1.0",
+      "integridad": "sha512-a0ftg+sH/mBURm/n1dfpDs2ixxusETnGRMTChfKKgQHveQSgKkYadNS/Nq0PkgXAU6OEy4B1ERAiP7Ds8yqKVg==",
+      "repositorio": "https://github.com/saagpatel/operant",
+      "nombre_registro": "io.github.saagpatel/operant-mcp"
+    },
+    {
+      "paquete": "@sabahattink/codediag",
+      "version": "0.13.0",
+      "integridad": "sha512-ryp2+PCmUoR8t5UU9l/GHWZDx9zGJCYIAVbg7wwgTcr/WHbzuODL/niD6Bb3XFFvPWlSmNHOcPH+ibLyAWSLUw==",
+      "repositorio": "https://github.com/sabahattink/codediag",
+      "nombre_registro": "io.github.sabahattink/codediag"
+    },
+    {
+      "paquete": "sanctionwise",
+      "version": "0.1.1",
+      "integridad": "sha512-u3Rt8/gPhH0WmrvRxntMQsqwMOJrERlYVgUAQimod5oZe1kA4wK6jAOMEm0DAGRVn59K4p3gku7gi4a6D5c9eA==",
+      "repositorio": "https://github.com/qinisolabs/sanctionwise",
+      "nombre_registro": "io.github.qinisolabs/sanctionwise"
+    },
+    {
+      "paquete": "solana-nft-mcp",
+      "version": "1.18.0",
+      "integridad": "sha512-d4d8fOHexU8B2eQwvActlGIjY5KdWY/KYER2v+7wUtH97HaKgJ2Mtu69nxRY53zWUhGZ0xmfXW2cUQjay3oscg==",
+      "repositorio": "https://github.com/p1xelapp/solana-nft-mcp",
+      "nombre_registro": "io.github.p1xelapp/solana-nft-mcp"
+    },
+    {
+      "paquete": "@stablecoinx/mcp",
+      "version": "0.4.0",
+      "integridad": "sha512-HynRWYcfBRa7FXvvtk5+bUtVXneYWxpHM7g/6s+AQRxTB0NMm7D10VT5VAu7a8oZFI1pTsZ4MKB+aotjJOE10A==",
+      "repositorio": "https://github.com/e2xlabs/stablecoinx-mcp",
+      "nombre_registro": "io.github.e2xlabs/stablecoinx-mcp"
+    },
+    {
+      "paquete": "subtitlepop-mcp",
+      "version": "0.1.0",
+      "integridad": "sha512-470fafTh34qakAQQ4kefmcD5PLH0yPfF2eLlkzO5JSflnUeHTJcXXpHf5aHmctcTIkTFsisSzf75kBr9j98zIw==",
+      "repositorio": "https://github.com/j-river/subtitlepop-mcp",
+      "nombre_registro": "io.github.j-river/subtitlepop"
+    },
+    {
+      "paquete": "syntropy-mcp",
+      "version": "2.5.0",
+      "integridad": "sha512-b52n1X3gVbinSrNsue2o9gfpS6EgLCj07+6xYYrazCrY9jKlmhdWePKQB92K/RktzQVcxxYinbnp+IfI3zfEDA==",
+      "repositorio": "https://github.com/macek166/synproof-syntropy",
+      "nombre_registro": "io.github.macek166/syntropy-mcp"
+    },
+    {
+      "paquete": "sysdesign-board",
+      "version": "0.1.2",
+      "integridad": "sha512-KhLs9S8kWHkLDVnQQrefcefBHczM2sEXT+B3GccFhXn3B+iXZCHe8mA5CeFJAvEHwx1tRWTRLJrg3jSs+EcpVw==",
+      "repositorio": "https://github.com/tGhattas/sysdesign-board",
+      "nombre_registro": "io.github.tGhattas/sysdesign-board"
+    },
+    {
+      "paquete": "@t3ratech/mcp-session-bridge",
+      "version": "1.4.1",
+      "integridad": "sha512-093KbQ3qrocKd+gm4ARrkhpa+6TcdY7XVJElzAP53BXY5Yb7hBiimU19+ipxzyi1KbVpbygU2Rlndr2aF/xBGg==",
+      "repositorio": "https://github.com/t3ratech/mcp-session-bridge",
+      "nombre_registro": "io.github.t3ratech/mcp-session-bridge"
+    },
+    {
+      "paquete": "@t4dhg/mcp-eudamed",
+      "version": "0.3.0",
+      "integridad": "sha512-bDlVj9B3V/pToaI3hj6PNQwdvtn8PFbn9EY3Se/ALyvIuLJDnCvTFmO3HKxygjmpiuLSwDLDEHrRJbu2np7nZQ==",
+      "repositorio": "https://github.com/t4dhg/mcp-eudamed",
+      "nombre_registro": "io.github.t4dhg/mcp-eudamed"
+    },
+    {
+      "paquete": "@table-bro/mcp",
+      "version": "1.2.2",
+      "integridad": "sha512-aj82yL9aNLC0xMWR8FH4nTItItUNvlE10UtsSXjcIiLORIDSErMpvcfMMi89RXTXt/5t5AJej7y+vf+MbPJomw==",
+      "repositorio": "https://github.com/table-bro/table-bro",
+      "nombre_registro": "io.github.table-bro/table-bro"
+    },
+    {
+      "paquete": "taiga-api-mcp-server",
+      "version": "0.5.0",
+      "integridad": "sha512-KW0vkcvLN3+VSOHcj8DeZtSfL0qOVxPEiWzSz/xOKWjxwG0ot522ylYUJ6r1jl8zOvhAA3yAJzOCNkF5u9kukQ==",
+      "repositorio": "https://github.com/xHisusx/taiga-api-client",
+      "nombre_registro": "io.github.xHisusx/taiga-mcp-server"
+    },
+    {
+      "paquete": "tether-browser",
+      "version": "0.4.1",
+      "integridad": "sha512-j+F7TLyOagv2DO6Ueqcghph+1Rw+eMyWtEmoTFsUE5BfVTlUiVLqFR6LC0i7soxd7gC9L2eSq5TQgNhMWvIdMg==",
+      "repositorio": "https://github.com/udaysinh-git/tether",
+      "nombre_registro": "io.github.udaysinh-git/tether"
+    },
+    {
+      "paquete": "@trishchuk/coolors-mcp",
+      "version": "2.0.0",
+      "integridad": "sha512-+9sI2xfp1UpPKlXlqWDlVJC27Ssg6TpwxaXsewHW/zZBCAg4jpqAyzbo+GHHrQMBO+KGC42+QoY2qZDUjQFDLw==",
+      "repositorio": "https://github.com/x51xxx/coolors-mcp",
+      "nombre_registro": "io.github.x51xxx/coolors-mcp"
+    },
+    {
+      "paquete": "@ucm/mcp-server",
+      "version": "0.3.3",
+      "integridad": "sha512-u0pgE80obaZXAERaOX5DfXDRhl6TNLXZoxlJuG6xYblwDG9373u4PaeXnMRXfLNzXl4USjtwP62Rjh2qrX/7eA==",
+      "repositorio": "https://github.com/ucmai/ucm.ai",
+      "nombre_registro": "io.github.ucmai/ucm"
+    },
+    {
+      "paquete": "veridigit",
+      "version": "0.1.0",
+      "integridad": "sha512-66mei8/k8HazV2f9rniXBh56yypm/yo4Hs7uH5avT1wVFoY3ue3VrBvu1BNUtEGGvjGkVw6zZuN8ZqpG2E5KUA==",
+      "repositorio": "https://github.com/qinisolabs/veridigit",
+      "nombre_registro": "io.github.qinisolabs/veridigit"
+    },
+    {
+      "paquete": "@w3tech.io/agent-rpc-mcp",
+      "version": "0.2.8",
+      "integridad": "sha512-G0nsYccGrB978ct3et18JT59H9DUSTKzhz/fGEKch+bqm7XN+s11H/shGIP2IJKuKMoTuzD7oQGJx3IoLSDUOg==",
+      "repositorio": "https://github.com/w3tech/agent-rpc-mcp-public",
+      "nombre_registro": "io.github.w3tech/agent-rpc-mcp"
+    },
+    {
+      "paquete": "x402-video-mcp",
+      "version": "0.1.3",
+      "integridad": "sha512-MLwsUhrthuxsCzpIXmoFg8bwKXLqsT3xCj4nL3RBTTku1XGYKaqyJxGflurqxbhvjD2WsokZICblszHSI8qXew==",
+      "repositorio": "https://github.com/x402-video/mcp",
+      "nombre_registro": "io.github.x402-video/seedance-video-generation"
+    },
+    {
+      "paquete": "x402node-mcp",
+      "version": "1.0.4",
+      "integridad": "sha512-6YRpd+B6goZtCKgjjiN4PdXkOeLhBwmStEAExMFaomT64ekPtmCxc6wNtQguzNT08xLdA4QKEr8qbUaJRD0Omg==",
+      "repositorio": "https://github.com/x402node/x402-mcp",
+      "nombre_registro": "io.github.x402node/x402-mcp"
+    },
+    {
+      "paquete": "@xcelsior-gpu/mcp",
+      "version": "0.1.2",
+      "integridad": "sha512-zER5p5KhkpoWWz2KS3bmfuXSDTlYqL5Kz31pw61EPmdcpmYqqOuyHHNKRSpeUzAuR8377ommLG4MmO3yvVevVw==",
+      "repositorio": "https://github.com/aabiro/xcelsior",
+      "nombre_registro": "io.github.aabiro/xcelsior"
+    },
+    {
+      "paquete": "@zactonz/mcp",
+      "version": "0.3.0",
+      "integridad": "sha512-plzlE1xt/7AjhLfKkpfZmHLo6LocKQJOoHEQqRVuCMmyrhGJw0ZaiHYchVTlWM2N6yImrEAR9tjNhTzDEl5MuA==",
+      "repositorio": "https://github.com/zactonz/zactonz-mcp",
+      "nombre_registro": "io.github.zactonz/zactonz-mcp"
+    },
+    {
+      "paquete": "zektor",
+      "version": "1.8.0",
+      "integridad": "sha512-wSlJtDBpkPd8R+rwpmuO7TghfIysi1hztVjwrusItv8Vh0fslW+zqAzQWXoq5jEkYJWXetx0u8ykY2OYpfeEXA==",
+      "repositorio": "https://github.com/m-akcan/zektor-cli",
+      "nombre_registro": "io.github.m-akcan/zektor"
+    },
+    {
+      "paquete": "@zenfun510/codex-mcp-go",
+      "version": "0.2.1",
+      "integridad": "sha512-M5gNhLESnwua9gkomd3vH4lwIcFW0RytzkFr3x40Tj8a3PVK1A4gzX6ehgK5dZjNapKZosVHebg0cfB/veyVCg==",
+      "repositorio": "https://github.com/w31r4/codex-mcp-go",
+      "nombre_registro": "io.github.w31r4/codex-mcp-go"
+    }
+  ]
+}

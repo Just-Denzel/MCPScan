@@ -1,8 +1,17 @@
 #!/usr/bin/env python3
 """Descarga N servidores MCP públicos de npm al formato de corpus, SIN ejecutar nada.
 
-Uso (desde la raíz): python frente_a_estatico/recolectar.py corpus/real [--n 100] [--semilla 1]
-Requiere Python 3.12 o superior.
+Requiere Python 3.12 o superior. Tres formas de uso, desde la raíz del repositorio:
+
+  1. Muestra nueva, sorteada del registry de hoy (cambia según la fecha):
+         python frente_a_estatico/recolectar.py corpus/real --n 100 [--semilla 1]
+  2. Guardar la lista exacta de una muestra ya descargada (sin descargar nada):
+         python frente_a_estatico/recolectar.py corpus/real --exportar-muestra corpus/muestra_real.json
+  3. Descargar exactamente esa misma muestra en otro computador:
+         python frente_a_estatico/recolectar.py corpus/real --desde-muestra corpus/muestra_real.json
+
+El registry de MCP cambia con el tiempo: la misma semilla en otra fecha da otra muestra.
+Para que todo el equipo analice los mismos servidores, se usa la forma 3.
 
 - Lista servidores del registry oficial de MCP (solo la última versión, activos, con paquete npm).
 - Para no sesgar hacia la "A", toma una página desde muchos puntos de partida (cursores).
@@ -93,51 +102,135 @@ def extraer(datos: bytes, destino: Path) -> None:
         tf.extractall(destino, members=[m for m in miembros if m.name], filter="data")
 
 
-def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("salida")
-    ap.add_argument("--n", type=int, default=100)
-    ap.add_argument("--semilla", type=int, default=1)
-    a = ap.parse_args()
-    salida = Path(a.salida)
-    salida.mkdir(parents=True, exist_ok=True)
+def carpeta_de(salida: Path, paquete: str) -> Path:
+    return salida / re.sub(r"[^a-zA-Z0-9._-]", "__", paquete.lstrip("@"))
 
+
+def bajar_uno(salida: Path, info: dict, fecha: str | None = None) -> str:
+    """Descarga y extrae un paquete. Devuelve 'nuevo' o 'ya estaba'; lanza excepción si falla.
+
+    Si info trae "integridad" (muestra guardada), exige que el paquete de npm sea idéntico.
+    """
+    carpeta = carpeta_de(salida, info["paquete"])
+    manifest = carpeta / "manifest.json"
+    if manifest.exists():  # ya descargado antes
+        previo = json.loads(manifest.read_text(encoding="utf-8"))
+        if previo.get("version") == info["version"]:
+            return "ya estaba"
+    if carpeta.exists():  # a medias o de otra versión: se rehace
+        shutil.rmtree(carpeta)
+    try:
+        datos, integ = descargar(info)
+        if info.get("integridad") and integ != info["integridad"]:
+            raise ValueError("el paquete en npm no coincide con la integridad guardada en la muestra")
+        extraer(datos, carpeta / "codigo")
+    except Exception:
+        if carpeta.exists():
+            shutil.rmtree(carpeta)
+        raise
+    manifest.write_text(json.dumps({
+        "nombre": carpeta.name, "fuente": "npm", "version": info["version"],
+        "repositorio": info.get("repositorio"), "fecha_descarga": fecha or date.today().isoformat(),
+        "tiene_codigo": True, "paquete": info["paquete"],
+        "nombre_registro_mcp": info.get("nombre_registro"), "integridad": integ,
+    }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+    return "nuevo"
+
+
+def exportar_muestra(salida: Path, archivo: Path) -> None:
+    """Guarda la lista exacta (paquete, versión, integridad) del corpus ya descargado."""
+    filas = []
+    for m in sorted(salida.glob("*/manifest.json")):
+        d = json.loads(m.read_text(encoding="utf-8"))
+        if d.get("fuente") != "npm":
+            continue
+        filas.append({"paquete": d["paquete"], "version": d["version"], "integridad": d["integridad"],
+                      "repositorio": d.get("repositorio"), "nombre_registro": d.get("nombre_registro_mcp")})
+    if not filas:
+        raise SystemExit(f"No hay servidores descargados en {salida}.")
+    fechas = sorted({json.loads(m.read_text(encoding="utf-8")).get("fecha_descarga", "")
+                     for m in salida.glob("*/manifest.json")})
+    archivo.parent.mkdir(parents=True, exist_ok=True)
+    archivo.write_text(json.dumps({
+        "descripcion": "Muestra de servidores MCP de npm analizada en MCPScan. "
+                       "Se reproduce con: python frente_a_estatico/recolectar.py corpus/real --desde-muestra " + archivo.as_posix(),
+        "fecha_descarga": fechas[0] if len(fechas) == 1 else fechas,
+        "fuente": "registry oficial de MCP + npm",
+        "servidores": filas,
+    }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+    print(f"Muestra de {len(filas)} servidores guardada en {archivo}. Súbela a git para que el equipo la use.")
+
+
+def desde_muestra(salida: Path, archivo: Path) -> None:
+    """Descarga exactamente los paquetes y versiones de una muestra guardada."""
+    muestra = json.loads(archivo.read_text(encoding="utf-8"))
+    fecha = muestra.get("fecha_descarga") if isinstance(muestra.get("fecha_descarga"), str) else None
+    servidores = muestra["servidores"]
+    nuevos = ya = 0
+    fallos = []
+    for i, info in enumerate(servidores, 1):
+        try:
+            estado = bajar_uno(salida, info, fecha)
+        except Exception as e:
+            fallos.append((info["paquete"], str(e)))
+            continue
+        nuevos += estado == "nuevo"
+        ya += estado == "ya estaba"
+        print(f"  [{i}/{len(servidores)}] {info['paquete']}@{info['version']} ({estado})")
+    extra = {d.name for d in salida.glob("*/") if (d / "manifest.json").exists()} - {
+        carpeta_de(salida, s["paquete"]).name for s in servidores}
+    print(f"\nListo: {nuevos} descargados, {ya} ya estaban. Fallos: {len(fallos)}")
+    for p, e in fallos:
+        print(f"  - {p}: {e}")
+    if extra:
+        print(f"ATENCIÓN: {salida} tiene {len(extra)} servidores que no están en la muestra; "
+              "bórralos o los resultados no serán comparables.")
+    if fallos:
+        raise SystemExit(1)
+
+
+def muestra_nueva(salida: Path, n: int, semilla: int) -> None:
     print("Listando servidores del registry oficial...")
     cand = candidatos()
     print(f"{len(cand)} paquetes npm candidatos")
     claves = sorted(cand)
-    random.Random(a.semilla).shuffle(claves)
-
+    random.Random(semilla).shuffle(claves)
     ok, fallos = 0, []
     for k in claves:
-        if ok >= a.n:
+        if ok >= n:
             break
-        info = cand[k]
-        carpeta = salida / re.sub(r"[^a-zA-Z0-9._-]", "__", info["paquete"].lstrip("@"))
-        if (carpeta / "manifest.json").exists():  # ya descargado en una corrida anterior
-            ok += 1
-            continue
-        if carpeta.exists():  # quedó a medias (corrida interrumpida): se rehace
-            shutil.rmtree(carpeta)
         try:
-            datos, integ = descargar(info)
-            extraer(datos, carpeta / "codigo")
+            bajar_uno(salida, cand[k])
         except Exception as e:
-            fallos.append((info["paquete"], str(e)))
-            if carpeta.exists():
-                shutil.rmtree(carpeta)
+            fallos.append((cand[k]["paquete"], str(e)))
             continue
-        (carpeta / "manifest.json").write_text(json.dumps({
-            "nombre": carpeta.name, "fuente": "npm", "version": info["version"],
-            "repositorio": info["repositorio"], "fecha_descarga": date.today().isoformat(),
-            "tiene_codigo": True, "paquete": info["paquete"],
-            "nombre_registro_mcp": info["nombre_registro"], "integridad": integ,
-        }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
         ok += 1
-        print(f"  [{ok}/{a.n}] {info['paquete']}@{info['version']}")
+        print(f"  [{ok}/{n}] {cand[k]['paquete']}@{cand[k]['version']}")
     print(f"\nListo: {ok} servidores en {salida}. Fallos: {len(fallos)}")
     for p, e in fallos[:10]:
         print(f"  - {p}: {e}")
+    print("Para que el equipo use esta misma muestra, guárdala con --exportar-muestra.")
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description="Descarga servidores MCP de npm sin ejecutarlos.")
+    ap.add_argument("salida", help="carpeta del corpus, por ejemplo corpus/real")
+    ap.add_argument("--n", type=int, default=100)
+    ap.add_argument("--semilla", type=int, default=1)
+    modo = ap.add_mutually_exclusive_group()
+    modo.add_argument("--exportar-muestra", metavar="ARCHIVO",
+                      help="guarda la lista exacta del corpus ya descargado (no descarga nada)")
+    modo.add_argument("--desde-muestra", metavar="ARCHIVO",
+                      help="descarga exactamente los paquetes y versiones de esa lista")
+    a = ap.parse_args()
+    salida = Path(a.salida)
+    salida.mkdir(parents=True, exist_ok=True)
+    if a.exportar_muestra:
+        exportar_muestra(salida, Path(a.exportar_muestra))
+    elif a.desde_muestra:
+        desde_muestra(salida, Path(a.desde_muestra))
+    else:
+        muestra_nueva(salida, a.n, a.semilla)
 
 
 if __name__ == "__main__":

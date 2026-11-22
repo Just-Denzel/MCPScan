@@ -9,6 +9,8 @@ Une los frentes A y B en una sola herramienta y mide qué tan bien funciona.
 | `pipeline.py` | Corre los analizadores sobre un corpus y escribe `hallazgos.json` y `hallazgos.log.json` |
 | `evaluar.py` | Precisión, recall y matriz de detección contra el ground truth |
 | `reporte.py` | Puntaje de riesgo por servidor, en Markdown y JSON |
+| `corrida_informe.py` | Corrida completa para el informe: desarrollo, validación y reales en un paso, con tablas |
+| `revision.py` | Resume la revisión manual de los hallazgos reales (precisión estimada) |
 | `generar_banco.py` | Regenera el banco de desarrollo, o el de validación con `--conjunto validacion` |
 | `validacion_privada.py` | Casos del conjunto de validación. **No está en git**: guardar una copia aparte |
 | `tsconfig.banco.json` | Para compilar el banco con `tsc` (lo usa la CI) |
@@ -95,13 +97,48 @@ Limitaciones de esta versión:
 - Solo bloquea la red; no registra los intentos de conexión, así que `exfil-variables-entorno` no se detecta de forma dinámica.
 - Solo detecta lo que se refleja en la respuesta: una inyección que no devuelve la salida del comando no se confirma.
 
+## Corrida para el informe
+
+Un solo comando corre desarrollo, validación y los servidores reales, y deja todo en `resultados/informe/<fecha_hora>/`:
+
+```bash
+python -m frente_c_pipeline.corrida_informe --sandbox
+```
+
+- `--sandbox` corre el sandbox (Docker) sobre desarrollo y validación. Sin él, usa los resultados que ya existan en `resultados/dinamico` y `resultados/dinamico_val`, y avisa de qué fecha son.
+- `--sin-validacion` y `--sin-reales` saltan esos conjuntos. Los reales nunca pasan por el sandbox.
+- Para los 100 reales tarda unos 12 minutos. Los reales tienen que ser la muestra oficial: `python frente_a_estatico/recolectar.py corpus/real --desde-muestra corpus/muestra_real.json`.
+
+| Archivo | Para qué |
+| --- | --- |
+| `tablas.md` | Tablas listas para el informe: desarrollo frente a validación, qué detecta cada técnica, recall por categoría, matrices y resumen de reales |
+| `tabla_resumen.csv`, `tabla_categorias.csv` | Las mismas cifras para hacer gráficos (separadas con `;`, se abren directo en Excel) |
+| `resumen.md` | Fecha, versión del código, analizadores, errores y avisos. **Revisarlo siempre** |
+| `reporte_real_anonimo.md` | Riesgo por servidor real con nombres S01, S02… Este es el que va al informe |
+| `revision_manual.csv` | Hallazgos reales para revisar a mano. **Privado**: tiene nombres reales |
+| `mapa_anonimizacion.csv` | S01 → nombre real. **Privado** |
+
+Las tablas de validación son privadas mientras alguien siga escribiendo reglas o heurísticas. Cuando el frente B entregue, se repite la corrida y sus columnas aparecen solas.
+
+## Revisión manual de los hallazgos reales
+
+Sin revisión manual, los hallazgos en servidores reales son sospechas, no vulnerabilidades. Para estimar cuántos son correctos:
+
+1. Abre `revision_manual.csv` en Excel. Para cada hallazgo, mira el código en `corpus/real/<servidor>/<ubicacion>` y escribe en **veredicto**:
+   - `verdadero`: el problema existe (por ejemplo, un parámetro de una herramienta llega de verdad a `exec`).
+   - `falso`: no es un problema (por ejemplo, el comando es fijo o lo arma el propio autor).
+   - `dudoso`: no se puede decidir leyendo el código.
+   En **nota**, una frase con el porqué.
+2. Guarda el archivo (como CSV) y corre:
+   ```bash
+   python -m frente_c_pipeline.revision resultados/informe/<fecha_hora>/revision_manual.csv
+   ```
+   Imprime la precisión estimada en servidores reales, global, por categoría y por regla, y la guarda en `revision_resumen.md`.
+
+Es la respuesta a la pregunta de investigación 1 y la cifra que más valida el trabajo. Si algún hallazgo es un problema real y grave, se aplica el protocolo de la sección de ética del README principal antes de mencionarlo.
+
 ## Pendiente
 
-1. Confirmar el aislamiento y guardar la salida como evidencia para el informe:
-   ```
-   docker run --rm --network none --entrypoint node mcpscan-sandbox -e "fetch('https://example.com').then(()=>console.log('RED ABIERTA: MAL')).catch(()=>console.log('sin red: OK'))"
-   docker run --rm --read-only --entrypoint sh mcpscan-sandbox -c "touch /home/sandbox/x && echo 'SE PUDO ESCRIBIR: MAL' || echo 'solo lectura: OK'"
-   ```
-2. Observar la red del contenedor (por ejemplo con una red Docker interna que registre las conexiones).
-3. Cuando A y B entreguen, correr el pipeline sobre `corpus/real` y revisar a mano una muestra de hallazgos para estimar falsos positivos.
-4. Tablas y gráficos para el informe a partir de `metricas.json` y `reporte.json`.
+1. Repetir la corrida para el informe cuando el frente B entregue.
+2. Revisar a mano los hallazgos reales (sección anterior).
+3. Observar la red del contenedor (trabajo futuro).

@@ -76,18 +76,32 @@ Mirar la columna `A:analizador` de la matriz de detección y que ningún benigno
 
 ## Descargar el corpus real
 
+El registry de MCP cambia con el tiempo: la misma semilla, en otra fecha, sortea otra muestra (entre el 9 y el 22 de noviembre solo coincidían 33 de 100 servidores). Por eso la muestra oficial del proyecto está guardada en **`corpus/muestra_real.json`** (paquete, versión e integridad de cada servidor), y todos descargan exactamente esa:
+
 ```bash
-python frente_a_estatico/recolectar.py corpus/real --n 100
+python frente_a_estatico/recolectar.py corpus/real --desde-muestra corpus/muestra_real.json
 ```
 
-- Solo descarga y descomprime, verificando la integridad del paquete. **Nunca ejecuta `npm install` ni scripts.**
-- Elige los servidores al azar con una semilla fija (`--semilla`), para que la muestra sea reproducible y se pueda citar en el informe.
-- Si se interrumpe, se puede volver a correr: retoma donde quedó y rehace los paquetes que quedaron a medias.
+Tarda menos de un minuto. Verifica que cada paquete sea idéntico al de la muestra (por su hash de integridad), y avisa si en `corpus/real` hay servidores que no están en ella.
+
+Otras formas de uso:
+
+```bash
+# Sortear una muestra nueva del registry de hoy (NO usar para el informe: cambia los resultados)
+python frente_a_estatico/recolectar.py corpus/real --n 100 --semilla 1
+
+# Guardar la lista exacta de un corpus ya descargado
+python frente_a_estatico/recolectar.py corpus/real --exportar-muestra corpus/muestra_real.json
+```
+
+- Solo descarga y descomprime. **Nunca ejecuta `npm install` ni scripts.**
+- Si se interrumpe, se puede volver a correr: no repite lo ya descargado y rehace lo que quedó a medias.
 - Deja fuera los servidores solo remotos, los de PyPI y los paquetes de más de 20 MB (o 200 MB descomprimidos). Hay que decirlo en las limitaciones.
 
 ## Notas
 
 - Muchos paquetes de npm traen JavaScript compilado o minificado, no TypeScript (el caso `exfil-minificado` lo imita en `dist/`). Las reglas deben revisar todos los archivos, no solo `src/`, y los hallazgos en código minificado cuestan más de leer.
-- Semgrep tarda unos 2 segundos por servidor (arranca una vez por cada uno); 100 servidores toman unos 4 minutos.
+- Semgrep corre con límites explícitos (archivos de hasta 10 MB y 120 s por regla, en `analizador.py`). Con los valores por defecto (1 MB y 5 s) se perdían hallazgos en archivos compilados grandes sin avisar, y el resultado cambiaba según la máquina. Si aun así no puede analizar un archivo completo, el pipeline muestra `ATENCIÓN … puede faltar algún hallazgo`.
+- Con esos límites, los 100 servidores reales toman unos 11 minutos.
 - Semgrep funciona en Windows (probado). Instalarlo en el mismo Python o entorno virtual con que se corre el pipeline: `python -m pip install semgrep`.
 - Los hallazgos sobre servidores reales se **revisan a mano** antes de afirmar nada, y se anonimizan en el informe.

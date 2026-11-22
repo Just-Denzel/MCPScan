@@ -18,6 +18,11 @@ from frente_a_estatico.detectores_python import analizar_python
 REGLAS = Path(__file__).resolve().parent / "reglas"
 SEVERIDAD = {"ERROR": "alta", "WARNING": "media", "INFO": "baja"}
 EXTENSIONES_JS = {".js", ".mjs", ".cjs", ".jsx", ".ts", ".mts", ".cts", ".tsx"}
+# Límites explícitos de Semgrep. Los valores por defecto (1 MB por archivo y 5 s por regla)
+# hacen que se pierdan hallazgos en archivos compilados grandes, sin avisar, y que el
+# resultado dependa de la máquina. Con estos valores, la misma muestra da lo mismo en todos lados.
+MAX_BYTES_ARCHIVO = 10_000_000
+TIMEOUT_REGLA_S = 120
 
 def _buscar_semgrep() -> str | None:
     """Semgrep en el PATH o, si no, en la carpeta de scripts de este Python.
@@ -89,13 +94,23 @@ def _semgrep(dir_servidor: Path) -> list[dict]:
         lote = objetivos[i:i + 100]
         r = subprocess.run(
             [semgrep, "--metrics=off", "--disable-version-check", "--quiet",
-             "--no-git-ignore", "--json", "-f", str(REGLAS), *lote],
+             "--no-git-ignore", "--json",
+             "--max-target-bytes", str(MAX_BYTES_ARCHIVO), "--timeout", str(TIMEOUT_REGLA_S),
+             "-f", str(REGLAS), *lote],
             capture_output=True, text=True,
         )
         # Sin esta comprobación, un Semgrep que falla parece "0 hallazgos" (falso negativo silencioso).
         if r.returncode not in (0, 1) or not r.stdout.strip():
             raise RuntimeError(f"Semgrep falló (código {r.returncode}): {r.stderr.strip()[-300:]}")
         datos = json.loads(r.stdout)
+        # Si Semgrep no puede analizar algo (tiempo excedido, archivo que no entiende entero),
+        # ese archivo puede tener hallazgos que no se ven: se avisa en vez de callarlo.
+        for err in datos.get("errors", []):
+            tipo = err.get("type", "error")
+            tipo = tipo[0] if isinstance(tipo, list) and tipo else tipo
+            archivo = Path(err.get("path") or (err.get("spans") or [{}])[0].get("file", "?")).name
+            print(f"ATENCIÓN [{dir_servidor.name}] Semgrep no pudo analizar completo {archivo} "
+                  f"({tipo}): puede faltar algún hallazgo en ese archivo.", file=sys.stderr)
         for res in datos.get("results", []):
             regla = res["check_id"].split(".")[-1]
             categoria = res["extra"].get("metadata", {}).get("categoria", regla)
