@@ -1,10 +1,121 @@
 rules:
-  - id: exec-con-plantilla
+  - id: exec-comando-dinamico
+    languages: [typescript, javascript]
+    # WARNING (media): marca cualquier comando armado con variables. Es una POSIBLE inyección;
+    # no prueba que el dato venga del modelo. En servidores reales requiere revisión manual.
+    # La inyección confirmada la entrega el sandbox (regla inyeccion-confirmada, severidad alta).
+    severity: WARNING
+    message: Se ejecuta un comando de shell construido dinámicamente (posible command injection si incluye datos del modelo).
+    metadata:
+      categoria: ejecucion-de-comando
+    patterns:
+      - pattern-either:
+          - pattern: execSync($CMD, ...)
+          - pattern: $CP.execSync($CMD, ...)
+          - patterns:
+              - pattern-either:
+                  - pattern-inside: |
+                      import { ..., exec, ... } from "child_process";
+                      ...
+                  - pattern-inside: |
+                      import { ..., exec, ... } from "node:child_process";
+                      ...
+                  - pattern-inside: |
+                      const { ..., exec, ... } = require("child_process");
+                      ...
+                  - pattern-inside: |
+                      const { ..., exec, ... } = require("node:child_process");
+                      ...
+              - pattern: exec($CMD, ...)
+          - patterns:
+              - pattern-either:
+                  - pattern-inside: |
+                      import $CP from "child_process";
+                      ...
+                  - pattern-inside: |
+                      import * as $CP from "child_process";
+                      ...
+                  - pattern-inside: |
+                      import $CP from "node:child_process";
+                      ...
+                  - pattern-inside: |
+                      import * as $CP from "node:child_process";
+                      ...
+                  - pattern-inside: |
+                      $CP = require("child_process");
+                      ...
+                  - pattern-inside: |
+                      $CP = require("node:child_process");
+                      ...
+              - pattern: $CP.exec($CMD, ...)
+          - patterns:
+              - pattern-either:
+                  - pattern-inside: |
+                      $FN = promisify(exec);
+                      ...
+                  - pattern-inside: |
+                      $FN = $U.promisify(exec);
+                      ...
+                  - pattern-inside: |
+                      $FN = promisify($CP.exec);
+                      ...
+                  - pattern-inside: |
+                      $FN = $U.promisify($CP.exec);
+                      ...
+              - pattern: $FN($CMD, ...)
+      - pattern-not: exec("...", ...)
+      - pattern-not: execSync("...", ...)
+      - pattern-not: $CP.exec("...", ...)
+      - pattern-not: $CP.execSync("...", ...)
+      - pattern-not: $FN("...", ...)
+
+  - id: spawn-con-shell
     languages: [typescript, javascript]
     severity: ERROR
-    message: Se concatena un valor en un comando de shell; si lo controla el modelo, hay command injection.
+    message: Se invoca spawn/execFile con shell habilitada; si recibe datos del modelo permite command injection.
     metadata:
       categoria: ejecucion-de-comando
     pattern-either:
-      - pattern: exec(`...${$X}...`, ...)
-      - pattern: execSync(`...${$X}...`, ...)
+      - pattern: 'spawn($CMD, $ARGS, { ..., shell: true, ... })'
+      - pattern: '$CP.spawn($CMD, $ARGS, { ..., shell: true, ... })'
+      - pattern: 'spawn($CMD, { ..., shell: true, ... })'
+      - pattern: '$CP.spawn($CMD, { ..., shell: true, ... })'
+      - pattern: 'spawnSync($CMD, $ARGS, { ..., shell: true, ... })'
+      - pattern: '$CP.spawnSync($CMD, $ARGS, { ..., shell: true, ... })'
+      - pattern: 'spawnSync($CMD, { ..., shell: true, ... })'
+      - pattern: '$CP.spawnSync($CMD, { ..., shell: true, ... })'
+      - pattern: 'execFile($CMD, $ARGS, { ..., shell: true, ... })'
+      - pattern: '$CP.execFile($CMD, $ARGS, { ..., shell: true, ... })'
+      - pattern: 'execFileSync($CMD, $ARGS, { ..., shell: true, ... })'
+      - pattern: '$CP.execFileSync($CMD, $ARGS, { ..., shell: true, ... })'
+
+  - id: shell-explicita-dinamica
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: Se invoca una shell explícita (sh/bash/cmd) con un comando dinámico.
+    metadata:
+      categoria: ejecucion-de-comando
+    patterns:
+      - pattern-either:
+          - pattern: spawn($SH, [$FLAG, $CMD, ...], ...)
+          - pattern: $CP.spawn($SH, [$FLAG, $CMD, ...], ...)
+          - pattern: spawnSync($SH, [$FLAG, $CMD, ...], ...)
+          - pattern: $CP.spawnSync($SH, [$FLAG, $CMD, ...], ...)
+          - pattern: execFile($SH, [$FLAG, $CMD, ...], ...)
+          - pattern: $CP.execFile($SH, [$FLAG, $CMD, ...], ...)
+          - pattern: execFileSync($SH, [$FLAG, $CMD, ...], ...)
+          - pattern: $CP.execFileSync($SH, [$FLAG, $CMD, ...], ...)
+      - metavariable-regex:
+          metavariable: $SH
+          regex: (?i)^["'](/bin/|/usr/bin/)?(sh|bash|zsh|cmd(\.exe)?|powershell(\.exe)?)["']$
+      - metavariable-regex:
+          metavariable: $FLAG
+          regex: (?i)^["'](-c|/c|-command)["']$
+      - pattern-not: spawn($SH, [$FLAG, "...", ...], ...)
+      - pattern-not: $CP.spawn($SH, [$FLAG, "...", ...], ...)
+      - pattern-not: spawnSync($SH, [$FLAG, "...", ...], ...)
+      - pattern-not: $CP.spawnSync($SH, [$FLAG, "...", ...], ...)
+      - pattern-not: execFile($SH, [$FLAG, "...", ...], ...)
+      - pattern-not: $CP.execFile($SH, [$FLAG, "...", ...], ...)
+      - pattern-not: execFileSync($SH, [$FLAG, "...", ...], ...)
+      - pattern-not: $CP.execFileSync($SH, [$FLAG, "...", ...], ...)

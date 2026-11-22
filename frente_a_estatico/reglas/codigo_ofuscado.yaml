@@ -1,0 +1,31 @@
+rules:
+  - id: ejecucion-codigo-decodificado
+    mode: taint
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: Se decodifica o reconstruye texto ofuscado y se ejecuta dinámicamente como código.
+    metadata:
+      categoria: codigo-ofuscado
+    pattern-sources:
+      - pattern: Buffer.from($X, "base64")
+      - pattern: Buffer.from($X, "base64url")
+      - pattern: Buffer.from($X, "hex")
+      - pattern: atob($X)
+      - pattern: String.fromCharCode(...)
+      - pattern: String.fromCodePoint(...)
+      - pattern: $X.reverse()
+      - pattern: $X.join("")
+    pattern-sinks:
+      - pattern: eval($CODE)
+      - pattern: new Function(..., $CODE)
+      - pattern: Function(..., $CODE)
+      - pattern: runInThisContext($CODE, ...)
+      - pattern: $VM.runInThisContext($CODE, ...)
+      - pattern: runInNewContext($CODE, ...)
+      - pattern: $VM.runInNewContext($CODE, ...)
+      - pattern: runInContext($CODE, ...)
+      - pattern: $VM.runInContext($CODE, ...)
+      - pattern: new Script($CODE, ...)
+      - pattern: new $VM.Script($CODE, ...)
+      - pattern: import($CODE)
+      - pattern: require($CODE)
