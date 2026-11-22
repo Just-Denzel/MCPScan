@@ -43,6 +43,8 @@ MCPScan/
 ├── corpus/
 │   ├── banco_de_pruebas/        18 servidores propios + ground_truth.json (desarrollo, versionado)
 │   ├── validacion/              conjunto de validación privado (NO se sube a git)
+│   ├── muestra_real.json        lista exacta de los 100 servidores reales analizados
+│   ├── muestra_control.json     67 servidores reales para validar mejoras de reglas
 │   └── real/                    servidores públicos descargados (NO se sube a git)
 ├── frente_a_estatico/           Análisis estático del código
 │   ├── analizador.py            analizar(dir_servidor) -> hallazgos
@@ -55,6 +57,8 @@ MCPScan/
 │   ├── pipeline.py              corre los analizadores y escribe hallazgos.json
 │   ├── evaluar.py               compara con el ground truth
 │   ├── reporte.py               puntaje de riesgo por servidor
+│   ├── corrida_informe.py       corrida completa con tablas para el informe
+│   ├── revision.py              resume la revisión manual de hallazgos reales
 │   ├── generar_banco.py         regenera el banco de pruebas
 │   └── sandbox/                 Dockerfile, cliente MCP y ejecutor
 ├── tests/                       pytest: contrato, banco de pruebas, pipeline
@@ -110,6 +114,9 @@ python -m frente_c_pipeline.evaluar corpus/banco_de_pruebas/ground_truth.json re
 # Reporte de riesgo por servidor (anonimizado, para el informe)
 python -m frente_c_pipeline.reporte resultados/hallazgos.json resultados/reporte.md --corpus corpus/banco_de_pruebas --anonimizar
 
+# Todo de una vez para el informe (desarrollo, validación, reales y tablas)
+python -m frente_c_pipeline.corrida_informe --sandbox
+
 # Tests
 python -m pytest -q
 ```
@@ -141,17 +148,18 @@ Notas para Windows:
 | Banco de desarrollo: 18 servidores (6 benignos, 12 maliciosos) | Listo; compila con `tsc` y el generador lo reproduce idéntico |
 | Conjunto de validación: 13 servidores (3 benignos, 10 maliciosos) | Listo; privado, fuera de git |
 | Pipeline, evaluador y reporte | Listos y probados |
-| Tests y CI | 11 tests pasando; CI escrita (se activa al subir a GitHub) |
+| Tests y CI | 16 tests pasando; CI activa en GitHub |
 | Descarga de servidores públicos | Lista y probada con 100 paquetes de npm |
-| Sandbox con Docker | Probado en Windows con Docker Desktop. Ahora también **confirma inyecciones** con payloads (verificado fuera de Docker sobre los 31 servidores); falta repetir en Docker y confirmar el aislamiento |
-| Frente A (reglas) | Una regla de ejemplo; faltan las demás |
-| Frente B (descripciones) | Placeholder que solo busca `<IMPORTANT>` |
+| Sandbox con Docker | Probado en Windows con Docker Desktop: confirma la inyección con payloads, sin marcar benignos. Aislamiento comprobado (sin red, solo lectura) |
+| Frente A | Terminado: 7 categorías y regla específica de MCP; 9 de 9 en desarrollo y 8 de 8 en validación, sin falsos positivos; en reales, la severidad alta solo marca la inyección real |
+| Frente B (descripciones) | Placeholder que solo busca `<IMPORTANT>`; pendiente |
+| Corrida para el informe y revisión manual | Listas (`corrida_informe.py`, `revision.py`) |
 
-Con los analizadores de ejemplo y el sandbox, sin marcar ningún benigno:
+Resultados con el frente A terminado, el placeholder del frente B y el sandbox (22 de noviembre de 2026), sin marcar ningún benigno:
 
 | Conjunto | Precisión | Recall |
 | --- | --- | --- |
-| Desarrollo (18 servidores) | 1,00 | 0,21 (3 de 14 problemas) |
-| Validación (13 servidores) | 1,00 | 0,09 (1 de 11 problemas) |
+| Desarrollo (18 servidores) | 1,00 | 0,71 (10 de 14 problemas) |
+| Validación (13 servidores) | 1,00 | 0,67 (8 de 12 problemas) |
 
-La diferencia ya muestra el riesgo de sobreajuste: la regla de ejemplo de Semgrep detecta la inyección del banco de desarrollo pero no su variante de validación. El sandbox, que prueba el comportamiento y no la forma del código, la confirma en ambos.
+Los problemas que faltan son todos del frente B (tool poisoning). En los 100 servidores reales hay 18 hallazgos en 4 servidores, pendientes de revisión manual.

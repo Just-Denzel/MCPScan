@@ -251,6 +251,14 @@ def _es_probable_secreto_generico(valor: str) -> bool:
     return tiene_letras and tiene_digitos and len(set(valor)) >= 8
 
 
+CLAVE_RECORTADA = re.compile(r"…|\.\.\.|<[^>]*>|\bREDACTED\b|\bEXAMPLE\b", re.IGNORECASE)
+
+
+def _clave_recortada(resto_de_linea: str) -> bool:
+    """Ejemplo de documentación ("-----BEGIN PRIVATE KEY-----\\n…\\n-----END...") y no una clave real."""
+    return bool(CLAVE_RECORTADA.search(resto_de_linea[:200]))
+
+
 def detectar_secretos(dir_servidor: Path) -> list[dict]:
     codigo = dir_servidor / "codigo"
     if not codigo.exists():
@@ -288,6 +296,8 @@ def detectar_secretos(dir_servidor: Path) -> list[dict]:
                 if regla_id == "secreto-asignacion-credencial":
                     if not _es_probable_secreto_generico(m.group(1)):
                         continue
+                if regla_id == "secreto-clave-privada" and _clave_recortada(linea[m.end():]):
+                    continue
 
                 inicio = max(0, m.start() - 25)
                 fin = min(len(linea), m.end() + 25)

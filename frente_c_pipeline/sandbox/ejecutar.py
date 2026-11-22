@@ -17,20 +17,29 @@ AQUI = Path(__file__).resolve().parent
 IMAGEN = "mcpscan-sandbox"
 
 
-def main() -> None:
+class DockerNoDisponible(RuntimeError):
+    pass
+
+
+def preparar_docker() -> None:
+    """Comprueba que Docker corra y construye la imagen. Lanza DockerNoDisponible si no se puede."""
     if shutil.which("docker") is None:
-        sys.exit("Docker no está instalado o no está en el PATH.")
+        raise DockerNoDisponible("Docker no está instalado o no está en el PATH.")
     if subprocess.run(["docker", "info"], capture_output=True).returncode != 0:
-        sys.exit("Docker está instalado pero el motor no está corriendo. Abre Docker Desktop, "
-                 "espera a que diga 'Engine running' y vuelve a intentar.")
-    corpus, salida = Path(sys.argv[1]).resolve(), Path(sys.argv[2])
-    salida.mkdir(parents=True, exist_ok=True)
+        raise DockerNoDisponible("Docker está instalado pero el motor no está corriendo. Abre Docker Desktop, "
+                                 "espera a que diga 'Engine running' y vuelve a intentar.")
     print("Construyendo la imagen (la primera vez descarga node:22-slim y tarda un par de minutos)...")
     b = subprocess.run(["docker", "build", "--progress=plain", "-t", IMAGEN, str(AQUI)],
                        capture_output=True, text=True, encoding="utf-8", errors="replace")
     if b.returncode != 0:
         print("\n".join((b.stdout + b.stderr).splitlines()[-40:]), file=sys.stderr)
-        sys.exit("\nFalló la construcción de la imagen. Copia el error de arriba.")
+        raise DockerNoDisponible("Falló la construcción de la imagen. Copia el error de arriba.")
+
+
+def ejecutar(corpus: Path, salida: Path) -> None:
+    """Corre cada servidor de `corpus` en su contenedor y deja <servidor>.json en `salida`."""
+    corpus = corpus.resolve()
+    salida.mkdir(parents=True, exist_ok=True)
     for d in sorted(p for p in corpus.iterdir() if (p / "manifest.json").exists()):
         print(f"-> {d.name}")
         cmd = [
@@ -48,6 +57,14 @@ def main() -> None:
         except subprocess.TimeoutExpired:
             texto = json.dumps({"servidor": d.name, "hallazgos": [], "error": "tiempo excedido"})
         (salida / f"{d.name}.json").write_text(texto, encoding="utf-8", newline="\n")
+
+
+def main() -> None:
+    try:
+        preparar_docker()
+    except DockerNoDisponible as e:
+        sys.exit(str(e))
+    ejecutar(Path(sys.argv[1]), Path(sys.argv[2]))
 
 
 if __name__ == "__main__":

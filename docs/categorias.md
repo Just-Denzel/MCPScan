@@ -21,7 +21,8 @@ Para cada categoría, piensen: ¿mi regla detecta *todas* las variantes listadas
 Un dato que controla el modelo (un parámetro de una herramienta) llega a un comando que interpreta una shell.
 
 - **Variantes:** `exec`, `execSync`; `spawn` o `spawnSync` con `shell: true`; shells explícitas (`sh -c`, `bash -c`, `cmd /c`). El comando puede armarse con plantilla, con concatenación (`+`) o en una variable antes de ejecutarse.
-- **No cuenta:** `execFile` o `spawn` con una **lista de argumentos y sin shell**; comandos fijos que no incluyen datos del modelo.
+- **No cuenta:** `execFile` o `spawn` con una **lista de argumentos y sin shell** (también `bash -c script -- dato`, donde el dato va como argumento y no como código); comandos fijos que no incluyen datos del modelo; el método `exec` de una expresión regular.
+- **Severidad:** alta solo si se comprueba en el código que el dato viene de los argumentos de una herramienta MCP; media si el comando es dinámico pero no se sabe de dónde viene el dato.
 
 ### `exfiltracion-red`
 Envía datos del usuario o del sistema a un destino externo que no tiene relación con lo que la herramienta dice hacer.
@@ -33,9 +34,9 @@ Envía datos del usuario o del sistema a un destino externo que no tiene relaci�
 ### `lectura-archivo-sensible`
 Lee archivos con credenciales o secretos del usuario, sin que la función lo justifique.
 
-- **Archivos típicos:** `~/.ssh/*`, `~/.aws/credentials`, `~/.npmrc`, `~/.netrc`, `.env`, `~/.config/*` (gcloud, kube, gh), perfiles y contraseñas del navegador.
+- **Archivos típicos:** `~/.ssh/*`, `~/.aws/credentials`, `~/.npmrc`, `~/.netrc`, `~/.env`, `~/.config/*` (gcloud, kube, gh), perfiles y contraseñas del navegador.
 - **Variantes:** rutas armadas con `os.homedir()`, `path.join`, concatenación de texto o `~`; lectura con `fs.readFileSync`, `fs.promises.readFile`, `readFile` importado de `node:fs/promises`, streams.
-- **No cuenta:** archivos del propio proyecto sin credenciales (por ejemplo `config.json`); lecturas limitadas a una carpeta propia del servidor.
+- **No cuenta:** archivos del propio proyecto (por ejemplo `config.json`, o el `.env` con la configuración del servidor o del proyecto en que trabaja); lecturas limitadas a una carpeta propia del servidor; textos que solo mencionan una ruta sensible sin leerla (documentación, descripciones, mensajes).
 
 ### `secreto-hardcodeado`
 Claves o credenciales escritas en cualquier archivo del paquete.

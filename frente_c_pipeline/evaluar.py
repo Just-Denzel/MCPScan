@@ -53,6 +53,16 @@ def evaluar(gt: dict, hall: list[dict]) -> dict:
     }
 
 
+def limpiar(r: dict) -> dict:
+    """Resultado de evaluar() sin los conjuntos internos, listo para guardar como JSON."""
+    sin = lambda m: {k: v for k, v in m.items() if not k.startswith("_")}
+    limpio = {k: v for k, v in r.items() if k != "esperados"}
+    limpio["global"] = sin(r["global"])
+    limpio["por_categoria"] = {c: sin(m) for c, m in r["por_categoria"].items()}
+    limpio["por_analizador"] = {a: sin(m) for a, m in r["por_analizador"].items()}
+    return limpio
+
+
 def _corto(modulo: str) -> str:
     """frente_a_estatico.analizador -> A:analizador; frente_b_descripciones.heuristicas -> B:heuristicas."""
     partes = modulo.split(".")
@@ -106,13 +116,8 @@ def main() -> None:
     r = evaluar(gt, hall)
     imprimir(r)
     if a.json:
-        limpio = {k: v for k, v in r.items() if k != "esperados"}
-        limpio["global"] = {k: v for k, v in r["global"].items() if not k.startswith("_")}
-        limpio["por_categoria"] = {c: {k: v for k, v in m.items() if not k.startswith("_")}
-                                   for c, m in r["por_categoria"].items()}
-        limpio["por_analizador"] = {a_: {k: v for k, v in m.items() if not k.startswith("_")}
-                                    for a_, m in r["por_analizador"].items()}
-        Path(a.json).write_text(json.dumps(limpio, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+        Path(a.json).write_text(json.dumps(limpiar(r), indent=2, ensure_ascii=False) + "\n",
+                                encoding="utf-8", newline="\n")
 
 
 if __name__ == "__main__":
