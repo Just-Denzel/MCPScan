@@ -7,6 +7,7 @@
 ```bash
 python frente_a_estatico/recolectar.py corpus/real --desde-muestra corpus/muestra_real.json
 ```
+- `muestra_control.json`: 67 servidores del 9 de noviembre que no están en la muestra oficial. **No se usa para ajustar reglas**: sirve para comprobar que una mejora generaliza (`python frente_a_estatico/recolectar.py corpus/control --desde-muestra corpus/muestra_control.json`).
 - `muestra_real.json`: la muestra oficial (paquete, versión e integridad de los 100 servidores), tomada del registry el 22 de noviembre de 2026. **Sí se sube a git.** No contiene hallazgos, solo qué se analizó.
 
 Formato de cada carpeta: ver [docs/formatos.md](../docs/formatos.md).

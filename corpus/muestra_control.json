@@ -1,0 +1,476 @@
+{
+  "descripcion": "Muestra de CONTROL: 67 servidores de npm tomados del registry de MCP el 9 de noviembre de 2026 que NO están en muestra_real.json. No se usó para ajustar reglas: sirve para medir si las mejoras generalizan. Se reproduce con: python frente_a_estatico/recolectar.py corpus/control --desde-muestra corpus/muestra_control.json",
+  "fecha_descarga": "2026-11-09",
+  "fuente": "registry oficial de MCP + npm",
+  "servidores": [
+    {
+      "paquete": "adobe-mcp-suite",
+      "version": "0.3.0",
+      "integridad": "sha512-YA4xyCZJQ0fac85ojh9huaffk3lCOEBFOKC3htO7hSBIc7IqjVEYC6/pPhq5EMw4FXxK9y8/L26KvbIva+nvKw==",
+      "repositorio": "https://github.com/zachshallbetter/adobe-mcp",
+      "nombre_registro": "io.github.zachshallbetter/adobe-mcp-suite"
+    },
+    {
+      "paquete": "@adrkit/mcp",
+      "version": "0.20.0",
+      "integridad": "sha512-0Ngf+DCJ6OHttXg/kZ1qSa5ypZIu8KxD+FAnpSF51hFkgK0y32BknBiuFeSuJzYtmCACGjGUmM17G7lUh2uWRA==",
+      "repositorio": "https://github.com/mbeacom/adrkit",
+      "nombre_registro": "dev.adrkit/mcp"
+    },
+    {
+      "paquete": "adtest-mcp",
+      "version": "1.1.0",
+      "integridad": "sha512-WJOWxCQB1TqwhQKMT1OL/r9yxyahXMDwpzwXAIoi/s9gWQcxzP072ftzpcGvpmVcBRAvWtuI8ekoffvot5iT3w==",
+      "repositorio": "https://github.com/menaker/adtest-mcp",
+      "nombre_registro": "ai.adtest/adtest-mcp"
+    },
+    {
+      "paquete": "aem-mcp-server",
+      "version": "1.3.9",
+      "integridad": "sha512-UArV9+rBJabVZDSkRoLbKHSb9cwSBVI+ezM0hPZuWM5XskegDEfk/YLrIpJkVISUJi78FCqCrX/EakxohJEdZg==",
+      "repositorio": "https://github.com/easingthemes/aem-mcp-server",
+      "nombre_registro": "io.github.easingthemes/aem-mcp-server"
+    },
+    {
+      "paquete": "@agent-bev/mcp-server",
+      "version": "0.2.6",
+      "integridad": "sha512-hoer9dJ9qeg75rVlxPgjqLHnSA6eRBNQu82fZDFOeL3zLW5RG/mHN8xhBhNnoCqywfA9wtEArLPu1XXFbBCzbQ==",
+      "repositorio": "https://github.com/agent-bev/bev-door",
+      "nombre_registro": "ai.agent-bev/bev-door"
+    },
+    {
+      "paquete": "@agentage/find-mcp",
+      "version": "1.13.4",
+      "integridad": "sha512-dhP2BTjMLBJJY6088SCAoNvbmPAxZr92NSG+puhIezn9/jR7ykYfwYL916CfLQhX8svXVEsdSicC3seotQp/hw==",
+      "repositorio": null,
+      "nombre_registro": "io.agentage/find-mcp"
+    },
+    {
+      "paquete": "agentdrop-mcp-server",
+      "version": "0.2.27",
+      "integridad": "sha512-R/MRXk/RMQ8/cw4Qq1ihKKhYUuacOt++ZFY1NjBJzcVrwBQskP/w/Wg/KEcTrTebBc6eStz0f+/uNh6SA7YVIw==",
+      "repositorio": "https://github.com/qFlav/agentdrop-mcp-server",
+      "nombre_registro": "io.github.qFlav/agentdrop-mcp-server"
+    },
+    {
+      "paquete": "@agentutil/norm-mcp",
+      "version": "1.0.0",
+      "integridad": "sha512-vIL23gwPSIHZXfrmRXWYmBN8OPt6WRp5IDiyjqUnNYtETKm0Yd65nepGESkLmBm6sA/npzUFY3kfy2h8wx7zuA==",
+      "repositorio": null,
+      "nombre_registro": "net.agentutil/norm-mcp"
+    },
+    {
+      "paquete": "@agentutil/undo-mcp",
+      "version": "1.0.0",
+      "integridad": "sha512-P3WtuwD8LFI7x4ymjMnN8eflg7O1BppxK8w4ekfwAq8DLFqGZWkJMcvk/Q5TT81AEojkZQLUwxRomyCoX6Wz4g==",
+      "repositorio": null,
+      "nombre_registro": "net.agentutil/undo-mcp"
+    },
+    {
+      "paquete": "aipatterns-mcp-server",
+      "version": "1.1.0",
+      "integridad": "sha512-ixQ3tXhIERd5/gLu5ea1goCPO2qXpix+ufT4ANXlzMx409ljhi6h9BPLJhsvasqSXH4/CD0s3C4/G2mtysDhCg==",
+      "repositorio": "https://github.com/uchit/aipatterns-mcp-server",
+      "nombre_registro": "io.github.uchit/aipatterns-mcp-server"
+    },
+    {
+      "paquete": "apifare-mcp",
+      "version": "0.4.1",
+      "integridad": "sha512-Tkt8x3XNRmKSJO+V54x4T5ix3u3wFbwVKKZDDDGj24afg+25yKv+DXvmWFWYXQktfG+BpR+oZQ+nOYtss9rtDw==",
+      "repositorio": "https://github.com/iamalanlui/apifare-mcp",
+      "nombre_registro": "io.github.iamalanlui/apipay"
+    },
+    {
+      "paquete": "boxpdf",
+      "version": "1.0.3",
+      "integridad": "sha512-YnLCdzdMOoqP8LfwLb3EtGUJ5mv63wJC+U39iY78KAjE4xZot+c1p0q5pBdHLNFiauYK+hRzXFso9PBAVtmbgA==",
+      "repositorio": "https://github.com/earonesty/boxpdf",
+      "nombre_registro": "io.github.earonesty/boxpdf"
+    },
+    {
+      "paquete": "@burtthecoder/mcp-dnstwist",
+      "version": "1.1.4",
+      "integridad": "sha512-HTBXqsaDa3vAZpieHWpSRq2337ekMjCWvVfus+Jt8IhvRuLivkKPfY86Wx4QcdDBRdZVAvbXrqCryT3Qr4YecQ==",
+      "repositorio": "https://github.com/w0h1v/mcp-dnstwist",
+      "nombre_registro": "io.github.w0h1v/dnstwist"
+    },
+    {
+      "paquete": "@cadencercs/mcp",
+      "version": "0.3.1",
+      "integridad": "sha512-c1slQG6A49OreSgvj1HPqnWxonHI/eoa5yumqCPcJ1Kp9MygitAFW7r1eeAbU7cCdukj+Y8ogu+Q3mp0CVKiLw==",
+      "repositorio": "https://github.com/dwixom/rcs-agent-mvp",
+      "nombre_registro": "com.cadencercs/cadence"
+    },
+    {
+      "paquete": "companieswise",
+      "version": "0.2.1",
+      "integridad": "sha512-wXxKv3jeYqhYVUkcGZ4YPkDWIE4FkfdYNNtoievDE2aUC6kBW3ZTXDJo7b+2VAWk8GN/XdMhTcYAIwQ5mAzWSQ==",
+      "repositorio": "https://github.com/qinisolabs/companieswise",
+      "nombre_registro": "io.github.qinisolabs/companieswise"
+    },
+    {
+      "paquete": "crazyseo",
+      "version": "0.1.3",
+      "integridad": "sha512-+3WmRK6dwXzwHzh1nFG/A17l0d2kfx53/vPsDiAFA9oRNS23vB7JlI6xE4I9DpL6tunYREWHhmwbwZetHOzF0Q==",
+      "repositorio": "https://github.com/d08m/crazyseo",
+      "nombre_registro": "io.github.d08m/crazyseo"
+    },
+    {
+      "paquete": "ecardwidget-mcp",
+      "version": "0.5.2",
+      "integridad": "sha512-JYhqva5ooWn2wgUBWeQawlaByvVjnaYn+wp3wIkI+5UJ2iJ+meANQrRn4skCfniLPZ1leP8b/rnsab8NlJyIJw==",
+      "repositorio": "https://github.com/eCardWidget/ecardwidget-mcp",
+      "nombre_registro": "io.github.eCardWidget/ecardwidget-mcp"
+    },
+    {
+      "paquete": "@ellul-estate/biobricks-org-research-synthesis-price-index-mcp",
+      "version": "1.0.0",
+      "integridad": "sha512-ThrXQTITG/1B53bZpyhsh1Siwz1YFJvYJrtQ1tIq4SD7mmaddAb6oxRFxl0bCmwVUvV+i4HGCxCe7u/28yzBEg==",
+      "repositorio": "https://github.com/joeetdev/venture-estate",
+      "nombre_registro": "org.biobricks/research-synthesis-price-index"
+    },
+    {
+      "paquete": "@ellul-estate/capanix-com-capanix-tools-mcp",
+      "version": "1.0.0",
+      "integridad": "sha512-aqnpA42Jjmu7z5e4piun2ylpfF3nh2sFt71wLFeptDb4vPkO9wpAJJg3eFi1E8AOlohiJfKJUJT+RqbDYky+dA==",
+      "repositorio": "https://github.com/joeetdev/venture-estate",
+      "nombre_registro": "com.capanix/capanix-tools"
+    },
+    {
+      "paquete": "employed-mcp",
+      "version": "1.2.1",
+      "integridad": "sha512-RZ2bBuZdOh+rFH58HvaZMgnRfeKFlJBgbpUfI++akkgcAIy8fBAfScIUhplIc9fV/D+pAtmWosnO2PuoHNW6+w==",
+      "repositorio": "https://github.com/Guaq-AI/employed-plugins",
+      "nombre_registro": "me.guaqai.jobs/employed"
+    },
+    {
+      "paquete": "@facultiai/mcp-server",
+      "version": "1.0.7",
+      "integridad": "sha512-bV/kO+NdTpbygUF2nJICGOrmVZJxhsK/xDrcTaSdufGgU3rqkbbOmoFi62d8mNZw4PeM2D6TPdYnHesolVvCGQ==",
+      "repositorio": "https://github.com/facultidev42FacultiDevelopment/servers",
+      "nombre_registro": "io.github.facultidev42FacultiDevelopment/faculti"
+    },
+    {
+      "paquete": "finlight-mcp",
+      "version": "1.0.3",
+      "integridad": "sha512-386vraPXmcvCMHxe0Q65D54R1ECtSQ2w7F+OwYl7VVjwTufv4YSyMKVsgY/IGYVGE9/K03PA26bt5pWokwqWrw==",
+      "repositorio": "https://github.com/callbk/finlight-mcp",
+      "nombre_registro": "me.finlight/news"
+    },
+    {
+      "paquete": "@fkadev/prompts.chat-mcp",
+      "version": "1.0.9",
+      "integridad": "sha512-n08CVSMdURsG9kVGWKh9lMoV4yquHzuyL/c9PTrP7Qr9KP2H47Xu1JNORo/sakU0Wm2OJYbCZN8nmAYFqyiwhQ==",
+      "repositorio": "https://github.com/f/prompts.chat-mcp",
+      "nombre_registro": "io.github.f/prompts.chat-mcp"
+    },
+    {
+      "paquete": "@g-digital/mcp-ead-factory",
+      "version": "1.4.0",
+      "integridad": "sha512-6PQGmNMREGs9wKsnw6AHFheIp7l1gGMjCii91AhYCWbVNGEsmc9K8jOfXGpjinBE/8FrGjIZaMA3QHs7RwkNJA==",
+      "repositorio": "https://github.com/g-digital-by-Garrigues/EAD-Factory-MCP",
+      "nombre_registro": "io.github.g-digital-by-Garrigues/ead-factory"
+    },
+    {
+      "paquete": "@g-digital/mcp-gocertius",
+      "version": "2.0.0",
+      "integridad": "sha512-S9zHWw+pEBycqQT0Qx0L3ZrbZCLUkWAoBpTD6Fc68TiTB3oVegp+C1dV5FKs8PYRpoopu9d+YyBA7DGpKaN8fA==",
+      "repositorio": "https://github.com/g-digital-by-Garrigues/GoCertius_MCP",
+      "nombre_registro": "io.github.g-digital-by-Garrigues/gocertius"
+    },
+    {
+      "paquete": "hypermarrow-mcp",
+      "version": "0.1.1",
+      "integridad": "sha512-Dap+3Baz3T3MfUgNL4HIAl1ZQmzjBcto7wek8O1tXgdxvyAKglTdSv4msi+A7sQt23cSfaLeKNYfpx8FO5Q5fA==",
+      "repositorio": "https://github.com/qianqiuwanzi/hypermarrow-mcp",
+      "nombre_registro": "io.github.qianqiuwanzi/hypermarrow-mcp"
+    },
+    {
+      "paquete": "@j0hanz/code-lens-mcp",
+      "version": "0.12.0",
+      "integridad": "sha512-eXecZ53tc0zkbXt0lLWpXAcKLmuGusS5Hdn+smCctiyK3VQhUqIDkeUHncrifyvgNyYBUIAqDqnvD3kFQvWdzQ==",
+      "repositorio": "https://github.com/j0hanz/code-lens",
+      "nombre_registro": "io.github.j0hanz/code-lens"
+    },
+    {
+      "paquete": "@kaael1/mcp-power-automate",
+      "version": "0.4.1",
+      "integridad": "sha512-dgmaF9RL2X4i3cEmmJ4vzf4JaxFDAnsWqnUHxKJRxTNqeXUOc7fevmc91rGtHqsiEgD2JD4ITJan7nzJVIFzcQ==",
+      "repositorio": "https://github.com/kaael1/mcp-power-automate",
+      "nombre_registro": "io.github.kaael1/mcp-power-automate"
+    },
+    {
+      "paquete": "@kadam-net/mcp-server",
+      "version": "0.3.4",
+      "integridad": "sha512-5BgAFo83EovCQ6fIYKky2ZTVs/da3wDnN0Tvf9Z5wPc9jQ1/duJBVBeffYpDfs/E/Pt9UkRhfk5RRlYZjPopYw==",
+      "repositorio": "https://github.com/kadam-official/mcp-server",
+      "nombre_registro": "io.github.kadam-official/mcp-server"
+    },
+    {
+      "paquete": "@kaditang/402sentinel-mcp",
+      "version": "0.9.0",
+      "integridad": "sha512-2sBrqHpTOkdiXLFeNLbcxRlzkFSbgNTGQtdxUJR2ua4kIvWcxJuYiE3YFWd4kS3l0YMqGCkbx/D9m/zRfZztuw==",
+      "repositorio": "https://github.com/kaditang/402sentinel-mcp",
+      "nombre_registro": "io.github.kaditang/402sentinel-mcp"
+    },
+    {
+      "paquete": "knownfix",
+      "version": "0.3.17",
+      "integridad": "sha512-dklgur0uIUAnrsQ47+w2A3dDH5CP99cD2mOfWeT5LI/YJurzodHOzYINDSt2gjoRr7ggBJ7z9bI89Wy9+Ufhvg==",
+      "repositorio": "https://github.com/b-hash88/knownfix",
+      "nombre_registro": "io.github.b-hash88/knownfix"
+    },
+    {
+      "paquete": "koda-verify",
+      "version": "0.3.2",
+      "integridad": "sha512-MlEy3kslgZM+wjRdXXOg8PTnDCHbaDGg+Wiftw2+ztFJVWWngyigFxHa5Uxd8l16DpHz3JxcndtlNO//OtzdwQ==",
+      "repositorio": "https://github.com/aabxtract/koda",
+      "nombre_registro": "io.github.aabxtract/koda"
+    },
+    {
+      "paquete": "korean-elementary-learning-map-mcp",
+      "version": "0.5.1",
+      "integridad": "sha512-6hYflVtMXxJLynvqwf4+kSmRex2mrKFPgIoae1kVyaelKYotn1QEVCOrlMlvtBGmrnslyWp/ppeQC0teoETAbw==",
+      "repositorio": "https://github.com/taehyeonglim/korean-elementary-learning-map-mcp",
+      "nombre_registro": "io.github.taehyeonglim/korean-elementary-learning-map-mcp"
+    },
+    {
+      "paquete": "@l-agence/mcp-server-agence",
+      "version": "1.0.0",
+      "integridad": "sha512-aADwybM3rDWLWvL+Y2LzZWsm//Gp0GH6dzp4oRJd04lEVwOx93FEhfSfowJPBcVlHhFIQPqLbi4Fa0+An5lsPA==",
+      "repositorio": "https://github.com/l-agence/agence",
+      "nombre_registro": "io.github.l-agence/agence"
+    },
+    {
+      "paquete": "@leadsync/mcp",
+      "version": "0.1.1",
+      "integridad": "sha512-Kk6b+rLlU7b63Pl/YINcMOnJ8dUcuj5FTeDe9kP4dnGSm3jxWm/jMat1yoRSOD9/T0KIgU55dvKyma/nhIk2iw==",
+      "repositorio": "https://github.com/lmoulton/leadsync-skills",
+      "nombre_registro": "me.leadsync/mcp"
+    },
+    {
+      "paquete": "localecheck",
+      "version": "0.1.1",
+      "integridad": "sha512-X+65qize7NZfOD6zYe/Edwvc1AahxkEmBSQJsLSetRKAIIbAojQaIP8n0tVF99tkdvsf5YdJoEvBJ2O8kdqgIA==",
+      "repositorio": "https://github.com/qinisolabs/localecheck",
+      "nombre_registro": "io.github.qinisolabs/localecheck"
+    },
+    {
+      "paquete": "looktwice-mcp",
+      "version": "0.1.1",
+      "integridad": "sha512-un5AO91aFR+tL8Ra4sUHllKPpeA0rEDAroPRd6b6i3lp9qvRufC0RZAZ8B5PpPSAd1JuSsUK4kBesWbjn1wWnA==",
+      "repositorio": "https://github.com/eason4kim-rocket/looktwice-mcp",
+      "nombre_registro": "io.github.eason4kim-rocket/looktwice-mcp"
+    },
+    {
+      "paquete": "@machinegrade/validate",
+      "version": "0.1.2",
+      "integridad": "sha512-2NCZR9r8Vs+OX4Tn9cwrgialxZLc4mWqIzWKpDshzk+zgJIB+VD3cJXsHf4/vJjfQpe0SNnBwJFTPUKabADNxA==",
+      "repositorio": "https://github.com/machinegrade/validate",
+      "nombre_registro": "io.github.machinegrade/validate"
+    },
+    {
+      "paquete": "mcp-church",
+      "version": "1.0.1",
+      "integridad": "sha512-bPwe+zSAbMzWDdRu8W7G8/eE1PADaYjt1BBGIcX+BxpTA4U/CmF+oEwCU9wjhqQTDnnE2Z4J3eF867k4VchHHg==",
+      "repositorio": "https://github.com/a-church-ai/church",
+      "nombre_registro": "io.github.a-church-ai/church"
+    },
+    {
+      "paquete": "mcp-dyson-appliances",
+      "version": "1.0.0",
+      "integridad": "sha512-9FzXk/7dDypv2XMjziig9K8IUWcgRDzLMsyIKzd0POQ8cJrUOUeMkwZG5EkQXnxE1eOhg5egjhLSsGOUJdgrYQ==",
+      "repositorio": "https://github.com/m2ai-mcp-servers/mcp-dyson-appliances",
+      "nombre_registro": "io.github.m2ai-mcp-servers/mcp-dyson-appliances"
+    },
+    {
+      "paquete": "mcp-ratchet-clinical-charting",
+      "version": "0.1.0",
+      "integridad": "sha512-+KR2XdI/Rc0MxBapQwYbYkhVoghPbJI56bCw22hSa2LPmxCtoW2CBTmFF71mkTgBZIdU7ZA+zEsG466CtPjruQ==",
+      "repositorio": "https://github.com/m2ai-mcp-servers/mcp-ratchet-clinical-charting",
+      "nombre_registro": "io.github.m2ai-mcp-servers/mcp-ratchet-clinical-charting"
+    },
+    {
+      "paquete": "mgi-mind",
+      "version": "2.8.2",
+      "integridad": "sha512-j0tb03rDPy8ZEN4hQPBU53XoKcCEhO61wPY195Nu98UuBdugdSZF2ZaiZs0PJ2OePJqnDS0fAxmAS/04ifF+YQ==",
+      "repositorio": "https://github.com/madgodinc/mgi-mind",
+      "nombre_registro": "io.github.madgodinc/mgi-mind"
+    },
+    {
+      "paquete": "mindlm-mcp",
+      "version": "0.1.1",
+      "integridad": "sha512-bsGMdTJfTa//ucb12lM8AqebZ0Vvt53cb11aKjkySg1C9GjzWdGZQFUKx2yOoWvAKEV0xKBmQ4wSSgXBEXkbrg==",
+      "repositorio": "https://github.com/qingchejun/mindlm-io",
+      "nombre_registro": "io.github.qingchejun/mindlm-mcp"
+    },
+    {
+      "paquete": "nuxt-i18n-mcp",
+      "version": "1.0.1",
+      "integridad": "sha512-3TdJXOCILnHlZLJcBqOYjz6GLQ+rQL52AKAAPvTkMKqbgQehOuYXBftX5fvZTJ/CnMR0lo/ceQ3F3RSfP/2YLw==",
+      "repositorio": "https://github.com/fabkho/nuxt-i18n-mcp",
+      "nombre_registro": "io.github.fabkho/nuxt-i18n-mcp"
+    },
+    {
+      "paquete": "@oabolade-pegasus/figma-mcp-server",
+      "version": "2.1.0",
+      "integridad": "sha512-bD3g4uCag/JxAAhsRygb4z/ZFC26JjtSKYHg6cy8c7eD4F7wdLRCHesRaL59oAB3m7DLlFkeL3U6nEhXXDAJQA==",
+      "repositorio": "https://github.com/oabolade/figma_mcp_server_actor",
+      "nombre_registro": "io.github.oabolade/figma_mcp_server_actor"
+    },
+    {
+      "paquete": "@obscuraai/mcp-server",
+      "version": "1.0.5",
+      "integridad": "sha512-wUjcnlL+d2DzQdP0s9GnoQXDcyCTsQHdZy63o5F61d/OPePDEpEicqCE0KjXJiJQOT+l2zqfpiYj4EzEEIlRJw==",
+      "repositorio": "https://github.com/madeinphantom/obscuraai-mcp-server",
+      "nombre_registro": "io.github.madeinphantom/obscuraai-mcp-server"
+    },
+    {
+      "paquete": "@opendata.cat/mcp-server",
+      "version": "0.6.1",
+      "integridad": "sha512-X22oA1RussHsiHFOwzi4PSyGXnsfM5CWVp3oRtLoFWHocyroijiSKg+WFYX7/U7yWKvc/t7HXC/eNes7463mgQ==",
+      "repositorio": "https://github.com/xaviviro/Opendata.cat-MCP-Server",
+      "nombre_registro": "io.github.xaviviro/opendata-cat"
+    },
+    {
+      "paquete": "@p-l-ta/calendar-mcp",
+      "version": "1.0.0",
+      "integridad": "sha512-edIoEOGi1QZE95KwK86W5eFGjBtQMq2Deu1ANRcHR4KI8h909q0PANO7a6HEAGu+4RPZ8zV/tH5QltJbVXxcPg==",
+      "repositorio": "https://github.com/p-l-ta/calendar-mcp",
+      "nombre_registro": "io.github.p-l-ta/calendar-mcp"
+    },
+    {
+      "paquete": "pictostl-mcp",
+      "version": "0.1.0",
+      "integridad": "sha512-H6jzFKQsTVsetVhSYuRIBlV0qimD2a4vZGRZ4zYRwelLD2xW0n1kv2wUAM/dMLzsipYsNUTrWwQj6w/HXMjJxQ==",
+      "repositorio": "https://github.com/qduoduo-hwh/pictostl-mcp",
+      "nombre_registro": "io.github.qduoduo-hwh/pictostl-mcp"
+    },
+    {
+      "paquete": "qingkuai-mcp-server",
+      "version": "1.0.13",
+      "integridad": "sha512-vn0Su0PI1JXZtJOEMEGrYgUBB7NMzozG0lKv+39nVuQs23KFFWREIqGXqN3t7o15pSyKYyXlPvWj75SfG2uzqw==",
+      "repositorio": "https://github.com/qingkuai-js/language-features",
+      "nombre_registro": "io.github.qingkuai-js/qingkuai-mcp-server"
+    },
+    {
+      "paquete": "review-assist-mcp",
+      "version": "1.1.1",
+      "integridad": "sha512-PQSTHjIx4elol0Fbb6QIUxSWiG1/iC+cFbtoiRRgmezni+iwOSfhrRmMY1RZwcs7ppS6oa14Ixy85yvv05LGsA==",
+      "repositorio": "https://github.com/uditk2/review-assist",
+      "nombre_registro": "io.github.uditk2/review-assist-mcp"
+    },
+    {
+      "paquete": "s3eidat-tools-mcp",
+      "version": "0.1.0",
+      "integridad": "sha512-nUG81/IbIeH5is3lNQxO7Ba3rj0nDJJPkPp8VAORJ60Gx9FZcLrql8NnNO/p1yb3x3G/6ZJ9NLKvH5wjz4DYUQ==",
+      "repositorio": "https://github.com/s3eidat/s3eidat-tools-mcp",
+      "nombre_registro": "io.github.s3eidat/s3eidat-tools-mcp"
+    },
+    {
+      "paquete": "sharebox-cli",
+      "version": "0.1.5",
+      "integridad": "sha512-ArH1GCBrqucmigmU826VZMxRBzxVlSZRMKhl+IAPgalE7vcQoXl6x1KsTydMKNg26Sm/mk2GP4hZmRc1uV7CWw==",
+      "repositorio": "https://github.com/zalaso/sharebox",
+      "nombre_registro": "io.github.zalaso/sharebox"
+    },
+    {
+      "paquete": "@sstim/mcp",
+      "version": "0.3.0",
+      "integridad": "sha512-MLbbWO71VWM4fipmthxnUcoLdLkb1otXWREsPET6psJDPXpC45R613t22ske5UpXfQvtjDorm8KxzxLk7yoJnA==",
+      "repositorio": "https://github.com/w3c-cg/sstim",
+      "nombre_registro": "io.github.w3c-cg/sstim"
+    },
+    {
+      "paquete": "stathead-mcp",
+      "version": "1.0.126",
+      "integridad": "sha512-uqhUZWSYWea1ahd0ects9OVHA3U5Pje8erMSJ8vtYPGFh4yhHuV8la4PdPLDoUa2j+0CsdskvbuO17cb6xEa1g==",
+      "repositorio": "https://github.com/dachhack/stathead",
+      "nombre_registro": "io.github.dachhack/stathead-mcp"
+    },
+    {
+      "paquete": "@taazkareem/clickup-mcp-server",
+      "version": "0.12.12",
+      "integridad": "sha512-fr2E2RfUOXLHzugROuIb6g1zO6lBRY43CuXUnXWnFdACgQPln2c10agZE+LTKM8DNdnqr2ScXQ1hOAPx1mtELA==",
+      "repositorio": "https://github.com/taazkareem/clickup-mcp-server",
+      "nombre_registro": "io.github.taazkareem/clickup"
+    },
+    {
+      "paquete": "@tago-io/mcp-server",
+      "version": "2.1.3",
+      "integridad": "sha512-gY+km8+xkqiChYH1M+gLtg+J5CkJnLCeIN2YbZm8tkdhA33j8QHZSE3U+f6+ZsROFfh5FxShV91qxnTq99bRWg==",
+      "repositorio": "https://github.com/tago-io/mcp-server",
+      "nombre_registro": "io.github.tago-io/mcp-server"
+    },
+    {
+      "paquete": "@tollxyz/mcp",
+      "version": "0.5.0",
+      "integridad": "sha512-/9Ijd/VsnRlwnmMamgSznHsMEIBXC2Ogu6sibIrgPt9ggx6fRbDdaBssqJ1iwcJUheBraDzie18l95Le/B8LBg==",
+      "repositorio": "https://github.com/t0ll-xyz/toll-plugins",
+      "nombre_registro": "io.github.t0ll-xyz/toll"
+    },
+    {
+      "paquete": "tunnel-mcp",
+      "version": "0.3.0",
+      "integridad": "sha512-UCGtsFs0FgNee2fjbRLBu1n3pJvpTBttR9sZJ1qB9pMT5bZBelBCFyK0g8slC2oKTr+LYhBQIGLHKkaWl9Ravw==",
+      "repositorio": "https://github.com/zachlikefolio/tunnel-mcp",
+      "nombre_registro": "io.github.zachlikefolio/tunnel-mcp"
+    },
+    {
+      "paquete": "ua-mcp",
+      "version": "1.2.16",
+      "integridad": "sha512-w/LG9v2dLSu4UVHur1HghjocAoouBiF7zzkx+V3adWV/sNWK9NTSRiWHaKM92si2YjB5TY2X0kBWr5DBS27+Cw==",
+      "repositorio": "https://github.com/uamcp/Understand-Anything-MCP",
+      "nombre_registro": "io.github.uamcp/ua-mcp"
+    },
+    {
+      "paquete": "@voltanotes/mcp",
+      "version": "1.1.1",
+      "integridad": "sha512-gloTAaNxJJmEhp/QPGJt6Z/mBqOcyz6DD7nII1WTuGqiSiIXHLO4ouZhrZrdi94J9joCf+29VY8vfSNxMrIT+A==",
+      "repositorio": "https://github.com/iamredmh/volta-mcp-server",
+      "nombre_registro": "io.github.iamredmh/volta-mcp-server"
+    },
+    {
+      "paquete": "@workswarm/modelcostsaver",
+      "version": "0.1.1",
+      "integridad": "sha512-IB4MaoSAzT6HYL0y0E1SU8VW/EtSteB7RiTB+Bt7PcSnRDwRz4OPft2/ipAnq2Fo0DVffI8SNo1jwdL0Ei4hFQ==",
+      "repositorio": "https://github.com/sachinuppal/modelcostsaver",
+      "nombre_registro": "io.github.sachinuppal/modelcostsaver"
+    },
+    {
+      "paquete": "wso2-docs-mcp-server",
+      "version": "1.3.16",
+      "integridad": "sha512-CA06ETg+kC1JGJh9oqdP3RrATkc+uDbcfuYqObbaxHKFojq8O2k1fSQLOk9a0BbNgfnYIhIYvSVOPLmYMIYQvg==",
+      "repositorio": "https://github.com/iamvirul/wso2-docs-mcp-server",
+      "nombre_registro": "io.github.iamvirul/wso2-docs-mcp-server"
+    },
+    {
+      "paquete": "@x207/mcp",
+      "version": "0.0.6",
+      "integridad": "sha512-HWhSJTLktaZugHpJd+nrh2F7mKCMmO4/ExnW+AJ4xRUdSchKbdsKCBlfORvC/kMAR7cQad3n5IRTGiL0q6CmGg==",
+      "repositorio": "https://github.com/x207-labs/sdk",
+      "nombre_registro": "io.github.x207-labs/x207-mcp"
+    },
+    {
+      "paquete": "x402station-mcp",
+      "version": "1.0.11",
+      "integridad": "sha512-e+aCoYPWf4+dAQYzpAK7I3LIMyOWKInb3uiD6k0YzgrbEULXiL22m+ZFmPG+J+MKQZcJ8hITlPa60Ofuye4Ogw==",
+      "repositorio": "https://github.com/sF1nX/x402station-mcp",
+      "nombre_registro": "io.github.sF1nX/x402station"
+    },
+    {
+      "paquete": "@xalantis/mcp-server",
+      "version": "0.3.1",
+      "integridad": "sha512-nBbXazo3s8F3ObZinzglSIlvOrjHsglgzrhdHvrTnifhTNGTw0/n4/v0Q7J46jVct6v3u4tS7dKCpj0f2lLbjg==",
+      "repositorio": "https://github.com/xalantis-hub/xalantis-mcp",
+      "nombre_registro": "io.github.xalantis-hub/xalantis-mcp"
+    },
+    {
+      "paquete": "@xchucx/agent-memory",
+      "version": "0.6.1",
+      "integridad": "sha512-ofL4UUq5Uz407MlqB3O7XQn8kH74TUWOJW3nyjsdcTygvDN7sN4QCwkHzhcPDq36UVA1/ATl4unAHe5QOUWYCg==",
+      "repositorio": "https://github.com/xChuCx/agent-memory",
+      "nombre_registro": "io.github.xChuCx/agent-memory"
+    }
+  ]
+}

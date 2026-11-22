@@ -44,6 +44,7 @@ MCPScan/
 │   ├── banco_de_pruebas/        18 servidores propios + ground_truth.json (desarrollo, versionado)
 │   ├── validacion/              conjunto de validación privado (NO se sube a git)
 │   ├── muestra_real.json        lista exacta de los 100 servidores reales analizados
+│   ├── muestra_control.json     67 servidores reales para validar mejoras de reglas
 │   └── real/                    servidores públicos descargados (NO se sube a git)
 ├── frente_a_estatico/           Análisis estático del código
 │   ├── analizador.py            analizar(dir_servidor) -> hallazgos
@@ -147,10 +148,10 @@ Notas para Windows:
 | Banco de desarrollo: 18 servidores (6 benignos, 12 maliciosos) | Listo; compila con `tsc` y el generador lo reproduce idéntico |
 | Conjunto de validación: 13 servidores (3 benignos, 10 maliciosos) | Listo; privado, fuera de git |
 | Pipeline, evaluador y reporte | Listos y probados |
-| Tests y CI | 15 tests pasando; CI activa en GitHub |
+| Tests y CI | 16 tests pasando; CI activa en GitHub |
 | Descarga de servidores públicos | Lista y probada con 100 paquetes de npm |
 | Sandbox con Docker | Probado en Windows con Docker Desktop: confirma la inyección con payloads, sin marcar benignos. Aislamiento comprobado (sin red, solo lectura) |
-| Frente A | Terminado: 7 categorías; 9 de 9 en desarrollo y 8 de 8 en validación, sin falsos positivos |
+| Frente A | Terminado: 7 categorías y regla específica de MCP; 9 de 9 en desarrollo y 8 de 8 en validación, sin falsos positivos; en reales, la severidad alta solo marca la inyección real |
 | Frente B (descripciones) | Placeholder que solo busca `<IMPORTANT>`; pendiente |
 | Corrida para el informe y revisión manual | Listas (`corrida_informe.py`, `revision.py`) |
 

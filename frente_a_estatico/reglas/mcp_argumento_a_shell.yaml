@@ -1,0 +1,119 @@
+# Regla específica de MCP: la única de ejecucion-de-comando con severidad ALTA.
+# Exige que el dato venga de los argumentos de una herramienta MCP (server.tool, registerTool
+# o request.params en setRequestHandler) y llegue a una shell, directo o a través de una
+# función envoltorio del mismo archivo. Las demás reglas de comandos quedan en severidad media.
+rules:
+  - id: mcp-argumento-a-shell
+    mode: taint
+    languages: [typescript, javascript]
+    severity: ERROR
+    message: Un argumento que el modelo envía a una herramienta MCP llega a un comando de shell (command injection).
+    metadata:
+      categoria: ejecucion-de-comando
+    pattern-sources:
+      # Parámetros del handler de server.tool / registerTool (el último argumento es la función).
+      - patterns:
+          - pattern-either:
+              - pattern-inside: $S.tool(..., ($P, ...) => { ... })
+              - pattern-inside: $S.tool(..., async ($P, ...) => { ... })
+              - pattern-inside: $S.tool(..., function ($P, ...) { ... })
+              - pattern-inside: $S.tool(..., async function ($P, ...) { ... })
+              - pattern-inside: $S.registerTool(..., ($P, ...) => { ... })
+              - pattern-inside: $S.registerTool(..., async ($P, ...) => { ... })
+          - pattern: $P
+      # Parámetros desestructurados: async ({ host, port }) => ...
+      - patterns:
+          - pattern-either:
+              - pattern-inside: '$S.tool(..., ({..., $X, ...}) => { ... })'
+              - pattern-inside: '$S.tool(..., async ({..., $X, ...}) => { ... })'
+              - pattern-inside: '$S.registerTool(..., ({..., $X, ...}) => { ... })'
+              - pattern-inside: '$S.registerTool(..., async ({..., $X, ...}) => { ... })'
+          - pattern: $X
+      # API de bajo nivel: request.params dentro del handler de CallTool.
+      - patterns:
+          - pattern-inside: $S.setRequestHandler($SCHEMA, ...)
+          - pattern: $REQ.params
+    pattern-sinks:
+      # Función envoltorio del mismo archivo cuyo parámetro llega a una shell:
+      #   function runCli(args) { return execSync(`mc ${args}`) }   ...   runCli(datoDelModelo)
+      - patterns:
+          - pattern-either:
+              - pattern-inside: |
+                  function $W($PAR, ...) { $...BODY }
+                  ...
+              - pattern-inside: |
+                  const $W = ($PAR, ...) => { $...BODY };
+                  ...
+          - pattern: $W(...)
+          - metavariable-pattern:
+              metavariable: $...BODY
+              pattern-either:
+                - pattern: execSync(<... $PAR ...>, ...)
+                - pattern: exec(<... $PAR ...>, ...)
+                - pattern: $CP.execSync(<... $PAR ...>, ...)
+                - patterns:
+                    - pattern: $CP.exec(<... $PAR ...>, ...)
+                    - metavariable-regex:
+                        metavariable: $CP
+                        regex: ^(cp|childProcess|child_process|childproc|child|proc|childProc)$
+      # exec / execSync solo si vienen de child_process (no RegExp.prototype.exec).
+      - patterns:
+          - pattern-either:
+              - pattern-inside: |
+                  import { ..., $FN, ... } from "child_process";
+                  ...
+              - pattern-inside: |
+                  import { ..., $FN, ... } from "node:child_process";
+                  ...
+              - pattern-inside: |
+                  const { ..., $FN, ... } = require("child_process");
+                  ...
+              - pattern-inside: |
+                  const { ..., $FN, ... } = require("node:child_process");
+                  ...
+          - pattern: $FN($CMD, ...)
+          - metavariable-regex:
+              metavariable: $FN
+              regex: ^(exec|execSync)$
+      - patterns:
+          - pattern-either:
+              - pattern-inside: |
+                  import $CP from "child_process";
+                  ...
+              - pattern-inside: |
+                  import * as $CP from "child_process";
+                  ...
+              - pattern-inside: |
+                  import $CP from "node:child_process";
+                  ...
+              - pattern-inside: |
+                  import * as $CP from "node:child_process";
+                  ...
+              - pattern-inside: |
+                  $CP = require("child_process");
+                  ...
+              - pattern-inside: |
+                  $CP = require("node:child_process");
+                  ...
+          - pattern-either:
+              - pattern: $CP.exec($CMD, ...)
+              - pattern: $CP.execSync($CMD, ...)
+      - patterns:
+          - pattern-either:
+              - pattern: 'spawn($C, $A, { ..., shell: true, ... })'
+              - pattern: '$CP.spawn($C, $A, { ..., shell: true, ... })'
+              - pattern: 'spawnSync($C, $A, { ..., shell: true, ... })'
+              - pattern: '$CP.spawnSync($C, $A, { ..., shell: true, ... })'
+              - pattern: 'execFile($C, $A, { ..., shell: true, ... })'
+              - pattern: '$CP.execFile($C, $A, { ..., shell: true, ... })'
+      - patterns:
+          - pattern-either:
+              - pattern: spawn($SH, [$F, ...], ...)
+              - pattern: $CP.spawn($SH, [$F, ...], ...)
+              - pattern: spawnSync($SH, [$F, ...], ...)
+              - pattern: $CP.spawnSync($SH, [$F, ...], ...)
+              - pattern: execFile($SH, [$F, ...], ...)
+              - pattern: $CP.execFile($SH, [$F, ...], ...)
+          - metavariable-regex:
+              metavariable: $SH
+              regex: (?i)^["'](/bin/|/usr/bin/)?(sh|bash|zsh|cmd(\.exe)?|powershell(\.exe)?)["']$

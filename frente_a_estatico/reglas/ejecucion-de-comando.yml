@@ -71,7 +71,7 @@ rules:
 
   - id: spawn-con-shell
     languages: [typescript, javascript]
-    severity: ERROR
+    severity: WARNING  # media: origen del dato desconocido (ver mcp_argumento_a_shell.yaml)
     message: Se invoca spawn/execFile con shell habilitada; si recibe datos del modelo permite command injection.
     metadata:
       categoria: ejecucion-de-comando
@@ -91,7 +91,7 @@ rules:
 
   - id: shell-explicita-dinamica
     languages: [typescript, javascript]
-    severity: ERROR
+    severity: WARNING  # media: origen del dato desconocido (ver mcp_argumento_a_shell.yaml)
     message: Se invoca una shell explícita (sh/bash/cmd) con un comando dinámico.
     metadata:
       categoria: ejecucion-de-comando

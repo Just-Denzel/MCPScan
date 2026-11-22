@@ -31,11 +31,11 @@ Las 7 categorías del frente están implementadas:
 
 | Categoría | Cómo se detecta | Dónde |
 | --- | --- | --- |
-| `ejecucion-de-comando` | Semgrep: `exec`/`execSync` con comando dinámico, `spawn`/`execFile` con `shell: true`, shells explícitas | `reglas/ejecucion-de-comando.yml` |
+| `ejecucion-de-comando` | **Alta:** Semgrep *taint* específico de MCP: un argumento de una herramienta (`server.tool`, `registerTool`, `request.params`) llega a una shell, directo o vía una función envoltorio. **Media:** cualquier comando armado con variables, `shell: true` o shells explícitas, de origen desconocido | `reglas/mcp_argumento_a_shell.yaml`, `reglas/ejecucion-de-comando.yml` |
 | `exfiltracion-red` | Semgrep *taint*: `process.env`, `hostname()`, `userInfo()` o archivos sensibles que llegan a `fetch`, `http(s)`, `axios`, `got`, sockets | `reglas/exfiltracion_red.yaml` |
-| `lectura-archivo-sensible` | Semgrep *taint* y rutas construidas hacia `.ssh`, `.aws`, `.npmrc`, `.netrc`, `~/.env`… | `reglas/lectura_archivo_sensible.yaml` |
+| `lectura-archivo-sensible` | Semgrep *taint* hacia funciones que leen archivos, y rutas armadas con `path.join` o desde `homedir()` hacia `.ssh`, `.aws`, `.npmrc`, `.netrc`, `~/.env`… | `reglas/lectura_archivo_sensible.yaml` |
 | `codigo-ofuscado` | Semgrep *taint*: base64, hex, `fromCharCode`… que llegan a `eval`, `new Function`, `vm.*` | `reglas/codigo_ofuscado.yaml` |
-| `secreto-hardcodeado` | Python: patrones de alta confianza (AWS, GitHub, Slack, claves privadas…) | `detectores_python.py` |
+| `secreto-hardcodeado` | Python: patrones de alta confianza (AWS, GitHub, Slack, claves privadas…); ignora claves recortadas de ejemplo (`…`) | `detectores_python.py` |
 | `dependencia-typosquat` | Python: distancia de edición contra una lista de paquetes populares | `detectores_python.py` |
 | `script-instalacion` | Python: `preinstall`, `install`, `postinstall` (severidad alta si sale a la red o ejecuta código) | `detectores_python.py` |
 
@@ -46,10 +46,27 @@ Resultados (21 de noviembre de 2026):
 | Desarrollo | 1,00 | 9 de 9 | 0 de 6 |
 | Validación privada | 1,00 | 8 de 8 | 0 de 3 |
 
-### Para el informe
+### Severidad
 
-- `exec-comando-dinamico` tiene severidad **media**: marca cualquier comando armado con variables, lo que es riesgo pero no prueba que el dato venga del modelo. En servidores reales estos hallazgos se revisan a mano y se reportan como *posible* inyección. La inyección **confirmada** la entrega el sandbox (`inyeccion-confirmada`, severidad alta).
-- `.env` se considera sensible en el proyecto o directamente en el home (`~/.env`), no dentro de la carpeta de configuración propia de una app (`~/.miapp/.env`), según `docs/categorias.md`.
+- **Alta** en `ejecucion-de-comando` solo con la regla específica de MCP (`mcp-argumento-a-shell`): está comprobado en el código que un argumento del modelo llega a la shell.
+- **Media** para los comandos armados con variables de origen desconocido (`exec-comando-dinamico`, `spawn-con-shell`, `shell-explicita-dinamica`). Son riesgo, pero no prueban que el dato venga del modelo: en servidores reales se revisan a mano.
+- `.env` cuenta como sensible solo en el home (`~/.env`). El `.env` de un proyecto o del propio servidor es configuración normal.
+- Las rutas sensibles cuentan si se arman como ruta (`path.join`, desde `homedir()`) o llegan a una lectura; un texto que solo las menciona (documentación, descripciones) no cuenta.
+
+### Mejora con servidores reales (22 de noviembre de 2026)
+
+La primera versión de las reglas tuvo precisión 1,00 en el banco, pero en la revisión manual de 100 servidores reales sus 9 hallazgos de severidad alta fueron falsos positivos, y la única inyección real estaba marcada como media. Se ajustaron las reglas mirando esos casos (que pasan a ser datos de desarrollo) y se midió en una **muestra de control** de 67 servidores que no se usó para ajustarlas (`corpus/muestra_control.json`):
+
+| Muestra | Versión | Alta: hallazgos (verdaderos) | Media: hallazgos (verdaderos) |
+| --- | --- | --- | --- |
+| Desarrollo (100 reales) | antes | 9 (0) | 7 (3) |
+| Desarrollo (100 reales) | después | 9 (9), todos de la misma vulnerabilidad | 9 (3) |
+| Control (67 reales) | antes | 1 (0) | 15 (2) |
+| Control (67 reales) | después | 0 | 16 (2) |
+
+El banco de desarrollo y la validación siguen en 9 de 9 y 8 de 8 sin falsos positivos. Límite: la muestra de control no tiene ninguna inyección real, así que en ella se midió que la severidad alta no da falsas alarmas, no su capacidad de encontrar inyecciones reales. La validación se usó para comprobar que no se rompiera nada, así que su resultado ya no es del todo ciego para esta versión.
+
+Los casos de `tests/casos_reglas/` documentan qué debe y qué no debe detectar cada regla; `tests/test_reglas.py` los comprueba.
 
 ## Cuidado con los falsos positivos
 
