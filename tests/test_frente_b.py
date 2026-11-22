@@ -1,11 +1,12 @@
-"""Frente B: heurísticas y extractor de herramientas."""
+"""Frente B: heurísticas, extractor de herramientas y clasificador LLM (sin llamar a la API)."""
 import json
+import re
 import shutil
 from pathlib import Path
 
 import pytest
 
-from frente_b_descripciones import heuristicas
+from frente_b_descripciones import clasificador_llm, heuristicas
 from frente_b_descripciones.extractor import MARCADOR, decodificar, estado, extraer, tokenizar
 from frente_b_descripciones.herramientas import cargar, textos
 
@@ -178,3 +179,89 @@ def test_cargar_extrae_si_no_hay_herramientas_json(tmp_path):
     (d / "herramientas.json").unlink()
     assert [h["nombre"] for h in cargar(d)] == ["traducir"]
     assert {h["categoria"] for h in heuristicas.analizar(d)} == {"tool-poisoning-instruccion"}
+
+
+# ------------------------------------------------------------------------------------------ clasificador LLM
+
+def _cfg(tmp_path, monkeypatch, clave="falsa"):
+    monkeypatch.setenv("MCPSCAN_LLM_CACHE", str(tmp_path / "cache"))
+    monkeypatch.setenv("MCPSCAN_LLM_PROVEEDOR", "anthropic")
+    if clave:
+        monkeypatch.setenv("ANTHROPIC_API_KEY", clave)
+    else:
+        monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+
+
+class _LLMFalso:
+    """Responde como lo haría el modelo, según palabras del texto. Cuenta las llamadas."""
+
+    def __init__(self, respuestas=None):
+        self.llamadas, self.respuestas = 0, respuestas
+
+    def __call__(self, cfg, sistema, usuario):
+        self.llamadas += 1
+        assert "<herramientas_" in usuario and "{nonce}" not in sistema
+        if self.respuestas:
+            return {"texto": self.respuestas[(self.llamadas - 1) % len(self.respuestas)],
+                    "tokens_entrada": 100, "tokens_salida": 10}
+        datos = json.loads(re.search(r"<herramientas_\w+>\n(.*)\n</herramientas_", usuario, re.S).group(1))
+        sos = []
+        for h in datos:
+            texto = h["descripcion"] + " ".join(h["parametros"].values())
+            if "<IMPORTANT>" in texto:
+                sos.append({"nombre": h["nombre"], "forma": "explicita", "texto_oculto": False, "donde": "descripcion",
+                            "severidad": "alta", "razon": "pide la clave SSH"})
+            if "conviene" in texto:
+                sos.append({"nombre": h["nombre"], "forma": "encubierta", "texto_oculto": False,
+                            "donde": "descripcion", "severidad": "alta", "razon": "encubierta"})
+            if any(0xE0000 <= ord(c) <= 0xE007F for c in texto):
+                sos.append({"nombre": h["nombre"], "forma": "explicita", "texto_oculto": True, "donde": "descripcion",
+                            "severidad": "alta", "razon": "texto invisible"})
+        sos.append({"nombre": "herramienta_inventada", "forma": "explicita", "razon": "inyectada"})
+        return {"texto": "Aquí va:\n" + json.dumps({"revisadas": len(datos), "sospechosas": sos}),
+                "tokens_entrada": 1000, "tokens_salida": 50}
+
+
+def test_llm_categorias_cache_y_costo(tmp_path, monkeypatch):
+    _cfg(tmp_path, monkeypatch)
+    falso = _LLMFalso()
+    monkeypatch.setattr(clasificador_llm, "transporte", falso)
+    clasificador_llm.ESTADISTICAS.clear()
+    pares = set()
+    for d in BANCO.iterdir():
+        if (d / "manifest.json").exists():
+            pares |= {(h["servidor"], h["categoria"]) for h in clasificador_llm.analizar(d)}
+    assert pares == {("poison-instruccion-oculta", "tool-poisoning-instruccion"),
+                     ("poison-parafraseado", "tool-poisoning-parafraseado"),
+                     ("poison-unicode-invisible", "tool-poisoning-unicode")}
+    pagadas = falso.llamadas
+    assert clasificador_llm.ESTADISTICAS[0]["costo_usd"] == pytest.approx((1000 * 0.10 + 50 * 0.50) / 1e6)
+    clasificador_llm.analizar(BANCO / "poison-parafraseado")       # segunda vez: desde la caché
+    assert falso.llamadas == pagadas
+
+
+def test_llm_sin_clave_ni_cache_falla_claro(tmp_path, monkeypatch):
+    _cfg(tmp_path, monkeypatch, clave=None)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    with pytest.raises(clasificador_llm.ErrorLLM, match="clave de API"):
+        clasificador_llm.analizar(BANCO / "poison-parafraseado")
+
+
+def test_llm_reintenta_si_la_respuesta_no_es_json(tmp_path, monkeypatch):
+    _cfg(tmp_path, monkeypatch)
+    falso = _LLMFalso(["No puedo responder eso.", '{"revisadas": 1, "sospechosas": []}'])
+    monkeypatch.setattr(clasificador_llm, "transporte", falso)
+    assert clasificador_llm.analizar(BANCO / "benigno-calculadora") == [] and falso.llamadas == 2
+
+
+def test_llm_vota_por_mayoria(tmp_path, monkeypatch):
+    s = lambda forma: {"nombre": "a", "forma": forma, "texto_oculto": False, "donde": "descripcion",
+                       "severidad": "alta", "razon": ""}
+    votos = clasificador_llm.votar([[s("explicita")], [s("explicita")], [s("encubierta")]])
+    assert [clasificador_llm.categoria(x) for x in votos] == ["tool-poisoning-instruccion"]
+    assert clasificador_llm.votar([[s("explicita")], [], []]) == []
+
+
+def test_llm_lotes_respetan_el_limite():
+    hs = [{"nombre": f"h{i}", "descripcion": "x" * 50_000, "esquema": {}} for i in range(5)]
+    assert [len(l) for l in clasificador_llm.lotes(hs)] == [2, 2, 1]
