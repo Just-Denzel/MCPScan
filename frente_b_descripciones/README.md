@@ -37,17 +37,22 @@ python -m frente_b_descripciones.extractor corpus/real --resumen resultados/extr
 
 ### Clave de API del clasificador
 
-La clave va en una variable de entorno, **nunca en el repositorio**:
+Por defecto usa **Gemini 3.6 Flash** con el nivel gratuito de la API de Google. La clave se saca gratis en [Google AI Studio](https://aistudio.google.com/apikey) y va en una variable de entorno, **nunca en el repositorio**:
 
 ```bash
-export ANTHROPIC_API_KEY=...          # PowerShell: $env:ANTHROPIC_API_KEY="..."
+export GEMINI_API_KEY=...          # cmd: set GEMINI_API_KEY=...   PowerShell: $env:GEMINI_API_KEY="..."
 ```
 
-Por defecto usa `claude-haiku-5-5` con temperatura 0. Se puede cambiar con `MCPSCAN_LLM_MODELO`, o usar un proveedor compatible con OpenAI con `OPENAI_API_KEY`, `MCPSCAN_LLM_PROVEEDOR=openai`, `MCPSCAN_LLM_MODELO` y, si no es OpenAI, `MCPSCAN_LLM_URL`. El resto de las opciones está al inicio de `clasificador_llm.py`.
+- Temperatura 0 y razonamiento en `low` (en Gemini 3 no se puede apagar). Se cambian con `MCPSCAN_LLM_TEMPERATURA` y `MCPSCAN_LLM_RAZONAMIENTO`.
+- El nivel gratuito limita las llamadas por minuto: si la API responde 429, el clasificador espera lo que pida y reintenta. Si se agota el límite diario, se vuelve a correr al otro día y lo ya respondido sale de la caché.
+- En el nivel gratuito, Google puede usar los prompts para mejorar sus productos. Aquí solo se envían descripciones de herramientas públicas o del banco.
+- El costo que reporta `comparar.py` es el del nivel pagado (1,50 / 7,50 USD por millón de tokens, el razonamiento se cobra como salida): sirve para estimar el costo a escala. Con el nivel gratuito el costo real es 0.
 
-Cada respuesta se guarda en `resultados/cache_llm/` con sus tokens, costo y tiempo. Repetir una corrida no vuelve a pagar, y si alguien comparte esa carpeta, los demás reproducen sus resultados sin clave. Sin clave y sin caché, el clasificador falla con un mensaje claro en cada servidor (el pipeline lo registra y sigue); para correr solo lo demás, usar `--analizadores`.
+Otros proveedores: con `ANTHROPIC_API_KEY` (y sin `GEMINI_API_KEY`) usa `claude-haiku-5-5`; con `OPENAI_API_KEY`, `MCPSCAN_LLM_PROVEEDOR=openai`, `MCPSCAN_LLM_MODELO` y, si no es OpenAI, `MCPSCAN_LLM_URL` (OpenRouter, Ollama). Para forzar uno: `MCPSCAN_LLM_PROVEEDOR=gemini|anthropic|openai`. El resto de las opciones está al inicio de `clasificador_llm.py`. **En el informe hay que indicar el modelo usado.**
 
-Costo estimado con Haiku 5.5: unos 20 mil tokens de entrada para el banco y unos 300 mil para los 88 servidores reales con herramientas, es decir, cerca de 0,03 USD por repetición sobre la muestra real.
+Cada respuesta se guarda en `resultados/cache_llm/` con sus tokens, costo y tiempo. Repetir una corrida no vuelve a llamar a la API, y si alguien comparte esa carpeta, los demás reproducen sus resultados sin clave. Sin clave y sin caché, el clasificador falla con un mensaje claro en cada servidor (el pipeline lo registra y sigue); para correr solo lo demás, usar `--analizadores`.
+
+Volumen estimado: unos 20 mil tokens de entrada para el banco y unos 300 mil para los 88 servidores reales con herramientas, por repetición.
 
 ## Heurísticas
 

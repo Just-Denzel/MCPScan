@@ -8,12 +8,18 @@ a un LLM con el prompt de prompts/clasificador_v2.md y convierte su respuesta JS
     forma explicita   -> tool-poisoning-instruccion
     forma encubierta  -> tool-poisoning-parafraseado
 
+Por defecto usa Gemini 3.6 Flash con el nivel gratuito de la API de Google (clave gratis en
+https://aistudio.google.com/apikey).
+
 Configuración por variables de entorno (la clave NUNCA va en el repositorio):
-    ANTHROPIC_API_KEY o OPENAI_API_KEY   clave del proveedor (se usa la que exista, en ese orden)
-    MCPSCAN_LLM_PROVEEDOR                anthropic | openai (forzar uno)
-    MCPSCAN_LLM_MODELO                   por defecto claude-haiku-5-5; con openai es obligatorio
+    GEMINI_API_KEY                       clave de Gemini (también sirve GOOGLE_API_KEY)
+    ANTHROPIC_API_KEY / OPENAI_API_KEY   claves de los otros proveedores
+    MCPSCAN_LLM_PROVEEDOR                gemini | anthropic | openai. Si no se indica, se usa el de la
+                                         primera clave que exista en ese orden (gemini si no hay ninguna)
+    MCPSCAN_LLM_MODELO                   por defecto gemini-3.6-flash o claude-haiku-5-5; con openai es obligatorio
     MCPSCAN_LLM_URL                      URL base compatible con OpenAI (OpenRouter, Ollama, etc.)
     MCPSCAN_LLM_TEMPERATURA              por defecto 0
+    MCPSCAN_LLM_RAZONAMIENTO             esfuerzo de razonamiento (reasoning_effort); por defecto low en Gemini
     MCPSCAN_LLM_REPETICIONES             llamadas por servidor; se vota por mayoría (por defecto 1)
     MCPSCAN_LLM_PRECIO_ENTRADA / _SALIDA USD por millón de tokens, si el modelo no está en PRECIOS
     MCPSCAN_LLM_CACHE                    carpeta de caché (por defecto resultados/cache_llm)
@@ -39,14 +45,28 @@ PROMPT = Path(__file__).resolve().parent / "prompts" / "clasificador_v2.md"
 VERSION_PROMPT = PROMPT.stem
 MAX_CARACTERES_LOTE = 120_000   # ~30-40 mil tokens: lejos del umbral de 100 mil donde sube el precio
 MAX_TOKENS_RESPUESTA = 4000
+MAX_TOKENS_RESPUESTA_GEMINI = 16000   # en Gemini 3 el razonamiento (que no se puede apagar) cuenta como salida
 REINTENTOS = 4
+REINTENTOS_LIMITE = 8                 # el nivel gratuito de Gemini limita las llamadas por minuto (error 429)
+ESPERA_MAXIMA = 60.0
+
+URL_GEMINI = "https://generativelanguage.googleapis.com/v1beta/openai"
 
 # USD por millón de tokens (entrada, salida), para prompts de menos de 100 mil tokens.
-# Fuente: página de precios de la API de Anthropic, noviembre de 2026.
+# Fuentes: páginas de precios de las API de Anthropic y de Google (Gemini), noviembre de 2026.
+# Gemini 3.6 Flash es gratis en el nivel gratuito; el precio es el del nivel pagado, para estimar
+# cuánto costaría usarlo a escala (el razonamiento se cobra como salida).
 PRECIOS = {
+    "gemini-3.6-flash": (1.50, 7.50),
     "claude-haiku-5-5": (0.10, 0.50),
     "claude-sonnet-5-5": (2.00, 10.00),
     "claude-opus-5-5": (4.00, 20.00),
+}
+PROVEEDORES = {
+    # proveedor: (variables con la clave, modelo por defecto, URL por defecto)
+    "gemini": (("GEMINI_API_KEY", "GOOGLE_API_KEY"), "gemini-3.6-flash", URL_GEMINI),
+    "anthropic": (("ANTHROPIC_API_KEY",), "claude-haiku-5-5", "https://api.anthropic.com/v1/messages"),
+    "openai": (("OPENAI_API_KEY",), "", "https://api.openai.com/v1"),
 }
 
 CATEGORIA = {"explicita": "tool-poisoning-instruccion", "encubierta": "tool-poisoning-parafraseado"}
@@ -58,14 +78,18 @@ class ErrorLLM(RuntimeError):
 
 # --------------------------------------------------------------------------- configuración
 
+def _clave(proveedor: str) -> str | None:
+    return next((os.environ[v] for v in PROVEEDORES[proveedor][0] if os.environ.get(v)), None)
+
+
 def configuracion() -> dict:
     proveedor = os.environ.get("MCPSCAN_LLM_PROVEEDOR")
     if not proveedor:
-        proveedor = "anthropic" if os.environ.get("ANTHROPIC_API_KEY") or not os.environ.get("OPENAI_API_KEY") \
-            else "openai"
-    if proveedor not in ("anthropic", "openai"):
-        raise ErrorLLM(f"MCPSCAN_LLM_PROVEEDOR debe ser anthropic u openai, no '{proveedor}'")
-    modelo = os.environ.get("MCPSCAN_LLM_MODELO") or ("claude-haiku-5-5" if proveedor == "anthropic" else "")
+        proveedor = next((p for p in PROVEEDORES if _clave(p)), "gemini")
+    if proveedor not in PROVEEDORES:
+        raise ErrorLLM(f"MCPSCAN_LLM_PROVEEDOR debe ser gemini, anthropic u openai, no '{proveedor}'")
+    variables, modelo_defecto, url_defecto = PROVEEDORES[proveedor]
+    modelo = os.environ.get("MCPSCAN_LLM_MODELO") or modelo_defecto
     if not modelo:
         raise ErrorLLM("con MCPSCAN_LLM_PROVEEDOR=openai hay que indicar el modelo en MCPSCAN_LLM_MODELO")
     precio = PRECIOS.get(modelo)
@@ -74,10 +98,11 @@ def configuracion() -> dict:
     return {
         "proveedor": proveedor,
         "modelo": modelo,
-        "clave": os.environ.get("ANTHROPIC_API_KEY" if proveedor == "anthropic" else "OPENAI_API_KEY"),
-        "url": os.environ.get("MCPSCAN_LLM_URL") or ("https://api.anthropic.com/v1/messages" if proveedor == "anthropic"
-                                                     else "https://api.openai.com/v1"),
+        "clave": _clave(proveedor),
+        "variables_clave": variables,
+        "url": os.environ.get("MCPSCAN_LLM_URL") or url_defecto,
         "temperatura": float(os.environ.get("MCPSCAN_LLM_TEMPERATURA", "0")),
+        "razonamiento": os.environ.get("MCPSCAN_LLM_RAZONAMIENTO") or ("low" if proveedor == "gemini" else None),
         "repeticiones": max(1, int(os.environ.get("MCPSCAN_LLM_REPETICIONES", "1"))),
         "precio": precio,
         "cache": Path(os.environ.get("MCPSCAN_LLM_CACHE") or RAIZ / "resultados" / "cache_llm"),
@@ -133,7 +158,8 @@ def _post(url: str, cabeceras: dict, cuerpo: dict) -> dict:
         return json.load(r)
 
 
-def _llamar_api(cfg: dict, sistema: str, usuario: str, temperatura: float | None) -> dict:
+def _llamar_api(cfg: dict, sistema: str, usuario: str, temperatura: float | None,
+               razonamiento: str | None = None) -> dict:
     """Una llamada real. Devuelve {'texto', 'tokens_entrada', 'tokens_salida'}."""
     if cfg["proveedor"] == "anthropic":
         cuerpo = {"model": cfg["modelo"], "max_tokens": MAX_TOKENS_RESPUESTA, "system": sistema,
@@ -144,37 +170,61 @@ def _llamar_api(cfg: dict, sistema: str, usuario: str, temperatura: float | None
         texto = "".join(b.get("text", "") for b in r.get("content", []) if b.get("type") == "text")
         u = r.get("usage", {})
         return {"texto": texto, "tokens_entrada": u.get("input_tokens", 0), "tokens_salida": u.get("output_tokens", 0)}
-    cuerpo = {"model": cfg["modelo"], "max_tokens": MAX_TOKENS_RESPUESTA,
+    # Gemini y OpenAI usan la API de chat/completions.
+    cuerpo = {"model": cfg["modelo"],
+              "max_tokens": MAX_TOKENS_RESPUESTA_GEMINI if cfg["proveedor"] == "gemini" else MAX_TOKENS_RESPUESTA,
               "messages": [{"role": "system", "content": sistema}, {"role": "user", "content": usuario}]}
     if temperatura is not None:
         cuerpo["temperature"] = temperatura
+    if razonamiento:
+        cuerpo["reasoning_effort"] = razonamiento
     r = _post(cfg["url"].rstrip("/") + "/chat/completions", {"authorization": f"Bearer {cfg['clave']}"}, cuerpo)
     u = r.get("usage", {})
-    return {"texto": r["choices"][0]["message"]["content"] or "",
-            "tokens_entrada": u.get("prompt_tokens", 0), "tokens_salida": u.get("completion_tokens", 0)}
+    eleccion = (r.get("choices") or [{}])[0]
+    texto = (eleccion.get("message") or {}).get("content") or ""
+    if not texto and eleccion.get("finish_reason") == "length":
+        raise ErrorLLM("el modelo agotó el límite de tokens de salida antes de responder (sube MAX_TOKENS_RESPUESTA "
+                       "o usa MCPSCAN_LLM_RAZONAMIENTO=minimal)")
+    return {"texto": texto, "tokens_entrada": u.get("prompt_tokens", 0), "tokens_salida": u.get("completion_tokens", 0)}
 
 
 def _llamar_con_reintentos(cfg: dict, sistema: str, usuario: str) -> dict:
-    temperatura = cfg["temperatura"]
-    espera = 2.0
-    for intento in range(REINTENTOS):
+    temperatura, razonamiento = cfg["temperatura"], cfg.get("razonamiento")
+    espera, intento, limites = 2.0, 0, 0
+    while True:
         try:
-            return _llamar_api(cfg, sistema, usuario, temperatura)
+            return _llamar_api(cfg, sistema, usuario, temperatura, razonamiento)
         except urllib.error.HTTPError as e:
-            detalle = e.read().decode("utf-8", "replace")[:300]
+            detalle = e.read().decode("utf-8", "replace")[:400]
             if e.code == 400 and "temperature" in detalle and temperatura is not None:
                 temperatura = None   # modelos que no aceptan temperatura: se usa la del proveedor
                 continue
-            if e.code in (408, 409, 429, 500, 502, 503, 504, 529) and intento + 1 < REINTENTOS:
-                time.sleep(espera); espera *= 2
+            if e.code == 400 and "reasoning" in detalle and razonamiento is not None:
+                razonamiento = None  # modelos sin esfuerzo de razonamiento configurable
                 continue
+            if e.code == 429 and limites + 1 < REINTENTOS_LIMITE:
+                # Límite por minuto: se espera lo que pide la API (Retry-After) o cada vez más.
+                limites += 1
+                pedida = e.headers.get("retry-after") if e.headers else None
+                time.sleep(min(float(pedida) if pedida and pedida.replace(".", "", 1).isdigit() else espera,
+                               ESPERA_MAXIMA))
+                espera = min(espera * 2, ESPERA_MAXIMA)
+                continue
+            if e.code in (408, 409, 500, 502, 503, 504, 529) and intento + 1 < REINTENTOS:
+                intento += 1
+                time.sleep(espera); espera = min(espera * 2, ESPERA_MAXIMA)
+                continue
+            if e.code == 429:
+                raise ErrorLLM(f"límite de uso de la API (429) después de {limites} esperas; si es el límite diario "
+                               f"del nivel gratuito, vuelve a correr mañana: lo ya respondido queda en caché. "
+                               f"{detalle}") from None
             raise ErrorLLM(f"la API respondió {e.code}: {detalle}") from None
         except (urllib.error.URLError, TimeoutError) as e:
             if intento + 1 < REINTENTOS:
-                time.sleep(espera); espera *= 2
+                intento += 1
+                time.sleep(espera); espera = min(espera * 2, ESPERA_MAXIMA)
                 continue
             raise ErrorLLM(f"no se pudo conectar con la API: {e}") from None
-    raise ErrorLLM("se agotaron los reintentos")
 
 
 # Se puede reemplazar en los tests (o para otro proveedor) con una función (cfg, sistema, usuario) -> dict.
@@ -186,8 +236,8 @@ ESTADISTICAS: list[dict] = []
 
 def consultar(cfg: dict, sistema: str, usuario: str, repeticion: int) -> dict:
     """Respuesta del modelo para un lote, desde la caché si ya se pidió antes."""
-    clave = hashlib.sha256(json.dumps([cfg["proveedor"], cfg["modelo"], cfg["temperatura"], VERSION_PROMPT,
-                                       sistema, usuario, repeticion]).encode("utf-8")).hexdigest()
+    clave = hashlib.sha256(json.dumps([cfg["proveedor"], cfg["modelo"], cfg["temperatura"], cfg.get("razonamiento"),
+                                       VERSION_PROMPT, sistema, usuario, repeticion]).encode("utf-8")).hexdigest()
     ruta = cfg["cache"] / f"{clave}.json"
     if ruta.exists():
         r = json.loads(ruta.read_text(encoding="utf-8"))
@@ -195,8 +245,8 @@ def consultar(cfg: dict, sistema: str, usuario: str, repeticion: int) -> dict:
                              "cache": True})
         return r
     if not cfg["clave"]:
-        raise ErrorLLM("falta la clave de API: define ANTHROPIC_API_KEY u OPENAI_API_KEY (no hay respuesta en caché "
-                       f"en {cfg['cache']})")
+        raise ErrorLLM(f"falta la clave de API de {cfg['proveedor']}: define {' o '.join(cfg['variables_clave'])} "
+                       f"(no hay respuesta en caché en {cfg['cache']})")
     inicio = time.time()
     r = transporte(cfg, sistema, usuario)
     r["segundos"] = round(time.time() - inicio, 2)

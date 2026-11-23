@@ -106,7 +106,7 @@ Desde la raíz del repositorio:
 pip install -r requirements.txt
 
 # Pipeline completo sobre el banco de pruebas
-# (el clasificador LLM del frente B necesita ANTHROPIC_API_KEY; ver frente_b_descripciones/README.md)
+# (el clasificador LLM del frente B necesita GEMINI_API_KEY, gratis; ver frente_b_descripciones/README.md)
 python -m frente_c_pipeline.pipeline corpus/banco_de_pruebas resultados/hallazgos.json
 
 # Comparación de las técnicas del frente B (heurísticas frente a LLM)

@@ -182,7 +182,9 @@ def main() -> None:
               f"- Repeticiones por servidor: {llm['repeticiones']} (los hallazgos se deciden por mayoría)",
               f"- Llamadas: {llm['llamadas']} ({llm['desde_cache']} desde caché)",
               f"- Tokens: {llm['tokens_entrada']} de entrada y {llm['tokens_salida']} de salida",
-              f"- Costo total: {llm['costo_total_usd']} USD; por servidor y repetición: {llm['costo_por_servidor_usd']} USD",
+              f"- Costo total: {llm['costo_total_usd']} USD; por servidor y repetición: {llm['costo_por_servidor_usd']} USD"
+              + (" (precio del nivel pagado de Gemini; con el nivel gratuito el costo real es 0)"
+                 if llm["proveedor"] == "gemini" else ""),
               f"- Tiempo medio por llamada: {llm['segundos_por_llamada']} s",
               f"- Consistencia: {_f(llm['consistencia_herramientas'])} de las herramientas y "
               f"{_f(llm['consistencia_servidores'])} de los servidores reciben el mismo veredicto en todas las repeticiones",

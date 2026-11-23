@@ -25,7 +25,7 @@ from comun.formatos import validar
 ANALIZADORES = [
     "frente_a_estatico.analizador",
     "frente_b_descripciones.heuristicas",
-    "frente_b_descripciones.clasificador_llm",  # requiere ANTHROPIC_API_KEY (u OPENAI_API_KEY) o caché
+    "frente_b_descripciones.clasificador_llm",  # requiere GEMINI_API_KEY (gratis) u otra clave, o caché
 ]
 
 

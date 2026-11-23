@@ -265,3 +265,43 @@ def test_llm_vota_por_mayoria(tmp_path, monkeypatch):
 def test_llm_lotes_respetan_el_limite():
     hs = [{"nombre": f"h{i}", "descripcion": "x" * 50_000, "esquema": {}} for i in range(5)]
     assert [len(l) for l in clasificador_llm.lotes(hs)] == [2, 2, 1]
+
+
+def test_llm_proveedor_por_defecto_es_gemini(monkeypatch):
+    for v in ("MCPSCAN_LLM_PROVEEDOR", "MCPSCAN_LLM_MODELO", "MCPSCAN_LLM_URL", "MCPSCAN_LLM_RAZONAMIENTO",
+              "GEMINI_API_KEY", "GOOGLE_API_KEY", "ANTHROPIC_API_KEY", "OPENAI_API_KEY"):
+        monkeypatch.delenv(v, raising=False)
+    cfg = clasificador_llm.configuracion()
+    assert (cfg["proveedor"], cfg["modelo"], cfg["clave"]) == ("gemini", "gemini-3.6-flash", None)
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "a")
+    assert clasificador_llm.configuracion()["proveedor"] == "anthropic"
+    monkeypatch.setenv("GEMINI_API_KEY", "g")
+    cfg = clasificador_llm.configuracion()
+    assert (cfg["proveedor"], cfg["clave"], cfg["razonamiento"]) == ("gemini", "g", "low")
+
+
+def test_llm_gemini_llamada_y_espera_por_limite(monkeypatch):
+    import io
+    import urllib.error
+    monkeypatch.setenv("GEMINI_API_KEY", "g")
+    monkeypatch.delenv("MCPSCAN_LLM_PROVEEDOR", raising=False)
+    monkeypatch.delenv("MCPSCAN_LLM_MODELO", raising=False)
+    monkeypatch.delenv("MCPSCAN_LLM_URL", raising=False)
+    cfg = clasificador_llm.configuracion()
+    pedidos, esperas = [], []
+
+    def post(url, cabeceras, cuerpo):
+        pedidos.append((url, cabeceras, cuerpo))
+        if len(pedidos) == 1:
+            raise urllib.error.HTTPError(url, 429, "RESOURCE_EXHAUSTED", {"retry-after": "7"}, io.BytesIO(b"{}"))
+        return {"choices": [{"message": {"content": '{"sospechosas": []}'}, "finish_reason": "stop"}],
+                "usage": {"prompt_tokens": 10, "completion_tokens": 5}}
+
+    monkeypatch.setattr(clasificador_llm, "_post", post)
+    monkeypatch.setattr(clasificador_llm.time, "sleep", esperas.append)
+    r = clasificador_llm._llamar_con_reintentos(cfg, "sistema", "usuario")
+    assert r["texto"] == '{"sospechosas": []}' and esperas == [7.0] and len(pedidos) == 2
+    url, cabeceras, cuerpo = pedidos[-1]
+    assert url == "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+    assert cabeceras == {"authorization": "Bearer g"}
+    assert cuerpo["model"] == "gemini-3.6-flash" and cuerpo["reasoning_effort"] == "low"
