@@ -24,7 +24,8 @@ from comun.formatos import validar
 # Para conectar un analizador nuevo: agregar aquí su módulo (debe exponer analizar()).
 ANALIZADORES = [
     "frente_a_estatico.analizador",
-    "frente_b_descripciones.analizador",
+    "frente_b_descripciones.heuristicas",
+    "frente_b_descripciones.clasificador_llm",  # requiere GEMINI_API_KEY (gratis) u otra clave, o caché
 ]
 
 

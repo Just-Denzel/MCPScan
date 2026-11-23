@@ -5,7 +5,7 @@ Herramienta que analiza servidores MCP públicos y entrega un reporte de riesgo 
 - **Código del servidor** (frente A): ejecución de comandos con datos del modelo, lectura de archivos sensibles, envío de datos a dominios externos, secretos hardcodeados, dependencias sospechosas y scripts de instalación.
 - **Descripciones de las herramientas** (frente B): *tool poisoning*, es decir, instrucciones ocultas dirigidas al modelo dentro del texto que describe una herramienta.
 
-Proyecto final del curso de seguridad (PUC Chile, 2026-2). Entrega del informe y el código: 19 de noviembre de 2026.
+Proyecto final del curso de seguridad (PUC Chile, 2026-2). Entrega del informe y el código: 24 de noviembre de 2026.
 
 **Integrantes:** Mario Rojas, Mauricio Pino, Fernando García.
 
@@ -51,7 +51,10 @@ MCPScan/
 │   ├── recolectar.py            descarga N servidores de npm al corpus
 │   └── reglas/                  reglas de Semgrep
 ├── frente_b_descripciones/      Tool poisoning
-│   ├── analizador.py            analizar(dir_servidor) -> hallazgos
+│   ├── heuristicas.py           analizar(dir_servidor) -> hallazgos (técnica 1)
+│   ├── clasificador_llm.py      analizar(dir_servidor) -> hallazgos (técnica 2, LLM-as-judge)
+│   ├── extractor.py             reconstruye herramientas.json desde el código de los reales
+│   ├── comparar.py              compara las dos técnicas (métricas, costo, consistencia)
 │   └── prompts/                 prompts del clasificador LLM
 ├── frente_c_pipeline/           Pipeline, evaluación, reporte y ejecución aislada
 │   ├── pipeline.py              corre los analizadores y escribe hallazgos.json
@@ -103,7 +106,11 @@ Desde la raíz del repositorio:
 pip install -r requirements.txt
 
 # Pipeline completo sobre el banco de pruebas
+# (el clasificador LLM del frente B necesita GEMINI_API_KEY, gratis; ver frente_b_descripciones/README.md)
 python -m frente_c_pipeline.pipeline corpus/banco_de_pruebas resultados/hallazgos.json
+
+# Comparación de las técnicas del frente B (heurísticas frente a LLM)
+python -m frente_b_descripciones.comparar corpus/banco_de_pruebas --repeticiones 3
 
 # Solo un módulo
 python -m frente_c_pipeline.pipeline corpus/banco_de_pruebas resultados/a.json --analizadores frente_a_estatico.analizador
@@ -148,18 +155,18 @@ Notas para Windows:
 | Banco de desarrollo: 18 servidores (6 benignos, 12 maliciosos) | Listo; compila con `tsc` y el generador lo reproduce idéntico |
 | Conjunto de validación: 13 servidores (3 benignos, 10 maliciosos) | Listo; privado, fuera de git |
 | Pipeline, evaluador y reporte | Listos y probados |
-| Tests y CI | 16 tests pasando; CI activa en GitHub |
+| Tests y CI | 46 tests pasando; CI activa en GitHub |
 | Descarga de servidores públicos | Lista y probada con 100 paquetes de npm |
 | Sandbox con Docker | Probado en Windows con Docker Desktop: confirma la inyección con payloads, sin marcar benignos. Aislamiento comprobado (sin red, solo lectura) |
 | Frente A | Terminado: 7 categorías y regla específica de MCP; 9 de 9 en desarrollo y 8 de 8 en validación, sin falsos positivos; en reales, la severidad alta solo marca la inyección real |
-| Frente B (descripciones) | Placeholder que solo busca `<IMPORTANT>`; pendiente |
+| Frente B (descripciones) | Heurísticas, clasificador LLM, extractor y comparación listos. Heurísticas: 5 de 5 en desarrollo, sin falsos positivos. Extractor: herramientas de 88 de los 100 reales. Falta correr el LLM con una clave de API |
 | Corrida para el informe y revisión manual | Listas (`corrida_informe.py`, `revision.py`) |
 
-Resultados con el frente A terminado, el placeholder del frente B y el sandbox (22 de noviembre de 2026), sin marcar ningún benigno:
+Resultados con el frente A y las heurísticas del frente B (22 de noviembre de 2026), sin marcar ningún benigno:
 
 | Conjunto | Precisión | Recall |
 | --- | --- | --- |
-| Desarrollo (18 servidores) | 1,00 | 0,71 (10 de 14 problemas) |
-| Validación (13 servidores) | 1,00 | 0,67 (8 de 12 problemas) |
+| Desarrollo (18 servidores) | 1,00 | 1,00 (14 de 14 problemas) |
+| Validación (13 servidores) | pendiente: la corre el frente C | |
 
-Los problemas que faltan son todos del frente B (tool poisoning). En los 100 servidores reales hay 18 hallazgos en 4 servidores, pendientes de revisión manual.
+Antes del frente B, el recall era 0,71 en desarrollo y 0,67 en validación; los problemas que faltaban eran todos de tool poisoning. En los 100 servidores reales, el frente A tiene 18 hallazgos en 4 servidores, pendientes de revisión manual; las heurísticas del frente B no marcan ninguno de los 88 servidores cuyas herramientas se pudieron extraer.

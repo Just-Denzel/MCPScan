@@ -40,7 +40,7 @@ corpus/<conjunto>/
 ```
 
 - Las descripciones de los **parámetros** van en `esquema.properties.<parámetro>.description`. El modelo también las lee, así que el frente B debe revisarlas.
-- El banco de pruebas trae `herramientas.json` listo. Los servidores reales descargados de npm **no lo traen**. Ver `frente_b_descripciones/README.md`.
+- El banco de pruebas trae `herramientas.json` listo. Los servidores reales descargados de npm **no lo traen**: `frente_b_descripciones/extractor.py` lo reconstruye leyendo el código (ver `frente_b_descripciones/README.md`). Las herramientas extraídas traen dos campos más: `origen` (`codigo/<archivo>:<línea>` donde se definen) y `patron` (cómo se encontraron).
 - `fuente` es `npm` para los reales y `local` para los del banco de pruebas.
 
 ## 2. Hallazgo
