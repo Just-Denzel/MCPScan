@@ -557,11 +557,11 @@ Se regeneran con `python -m frente_c_pipeline.generar_banco corpus/banco_de_prue
 """
 
 
-LEEME_VALIDACION = """# Conjunto de validación (PRIVADO)
+LEEME_VALIDACION = """# Conjunto de validación
 
-No se sube a git y no se comparte con quienes escriben reglas o heurísticas.
-Se usa una sola vez, al final, para medir si los analizadores generalizan más allá
-del banco de desarrollo. Las categorías siguen docs/categorias.md.
+No está en el repositorio, para que siga siendo un conjunto ciego. Se usa al final,
+para medir si los analizadores generalizan más allá del banco de desarrollo.
+Las categorías siguen docs/categorias.md.
 
 Se regenera con:
     python -m frente_c_pipeline.generar_banco corpus/validacion --conjunto validacion
@@ -579,7 +579,7 @@ def main():
         try:
             from frente_c_pipeline.validacion_privada import SERVIDORES as servidores
         except ImportError:
-            sys.exit("Falta frente_c_pipeline/validacion_privada.py (no está en git: pídeselo a quien lo tiene).")
+            sys.exit("Falta frente_c_pipeline/validacion_privada.py (el conjunto de validación no está en el repositorio).")
         leeme = LEEME_VALIDACION
     else:
         servidores, leeme = SERVIDORES, LEEME

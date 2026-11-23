@@ -12,7 +12,7 @@ Une los frentes A y B en una sola herramienta y mide qué tan bien funciona.
 | `corrida_informe.py` | Corrida completa para el informe: desarrollo, validación y reales en un paso, con tablas |
 | `revision.py` | Resume la revisión manual de los hallazgos reales (precisión estimada) |
 | `generar_banco.py` | Regenera el banco de desarrollo, o el de validación con `--conjunto validacion` |
-| `validacion_privada.py` | Casos del conjunto de validación. **No está en git**: guardar una copia aparte |
+| `validacion_privada.py` | Casos del conjunto de validación. No está en el repositorio (conjunto ciego) |
 | `tsconfig.banco.json` | Para compilar el banco con `tsc` (lo usa la CI) |
 | `sandbox/` | Ejecuta los servidores de prueba en contenedores aislados |
 
@@ -29,7 +29,7 @@ python -m frente_c_pipeline.pipeline corpus/banco_de_pruebas resultados/todo.jso
 
 - Importa los módulos de `ANALIZADORES` (arriba de `pipeline.py`) y suma lo que devuelve `analizar()` de cada uno.
 - Valida cada hallazgo contra `comun/formatos.py` y le agrega el campo `analizador`.
-- Si un analizador falla en un servidor, registra el error y sigue. Los errores, la fecha, el corpus y la duración quedan en `<salida>.log.json`. **Revisarlo**: un frente que falla en todos los servidores aparece como "0 hallazgos".
+- Si un analizador falla en un servidor, registra el error y sigue. Los errores, la fecha, el corpus y la duración quedan en `<salida>.log.json`. Conviene revisarlo: un analizador que falla en todos los servidores aparece como "0 hallazgos".
 - No lee el ground truth.
 
 ## Evaluación
@@ -55,7 +55,7 @@ Puntaje por servidor = suma del peso de cada categoría distinta encontrada (alt
 
 ## Banco de pruebas
 
-18 servidores escritos por el equipo: 6 benignos (4 de ellos parecidos a los maliciosos) y 12 con un problema conocido. Están descritos en `corpus/banco_de_pruebas/LEEME.md`. Para agregar o cambiar casos, se edita `generar_banco.py` y se regenera:
+18 servidores propios: 6 benignos (4 de ellos parecidos a los maliciosos) y 12 con un problema conocido. Están descritos en `corpus/banco_de_pruebas/LEEME.md`. Los casos se definen en `generar_banco.py` y se regeneran con:
 
 ```bash
 python -m frente_c_pipeline.generar_banco corpus/banco_de_pruebas
@@ -63,13 +63,12 @@ python -m frente_c_pipeline.generar_banco corpus/banco_de_pruebas
 
 Un test comprueba que el banco versionado coincide con el generador, así que no se edita a mano. Los servidores son inertes: los destinos de red usan el dominio reservado `.invalid`, que nunca resuelve, y las claves son de ejemplo.
 
-## Conjunto de validación (privado)
+## Conjunto de validación
 
 13 servidores (3 benignos, 10 maliciosos) con variantes que **no están** en el banco de desarrollo, tomadas de las familias de [docs/categorias.md](../docs/categorias.md). Sirven para medir si las reglas de A y B generalizan o solo memorizaron los ejemplos.
 
-- Los casos están en `validacion_privada.py` y se generan en `corpus/validacion/`. **Ninguno de los dos se sube a git** ni se comparte con quienes escriben reglas.
-- **Guarda una copia de `validacion_privada.py` fuera del repositorio** (por ejemplo en tu OneDrive): si se pierde, no hay otra.
-- Se usa una sola vez, al final, cuando A y B den por terminadas sus reglas:
+- Los casos están en `validacion_privada.py` y se generan en `corpus/validacion/`. Ninguno de los dos está en el repositorio, para que el conjunto siga siendo ciego.
+- Se evaluó al final, con las reglas de A y B terminadas:
 
 ```bash
 python -m frente_c_pipeline.generar_banco corpus/validacion --conjunto validacion
@@ -78,7 +77,7 @@ python -m frente_c_pipeline.pipeline corpus/validacion resultados/val.json --din
 python -m frente_c_pipeline.evaluar corpus/validacion/ground_truth.json resultados/val.json --json resultados/metricas_val.json
 ```
 
-En el informe se reportan ambos resultados, desarrollo y validación, lado a lado. Si después de evaluar se corrigen reglas mirando la validación, ese resultado deja de valer como validación: hay que decirlo.
+Los resultados de desarrollo y validación se reportan lado a lado. Si se corrigen reglas mirando la validación, ese resultado deja de ser ciego; ocurrió en parte con la mejora de reglas del frente A, que usó la validación para comprobar que no se rompiera nada (ver su README).
 
 ## Sandbox (ejecución aislada)
 
@@ -107,38 +106,35 @@ python -m frente_c_pipeline.corrida_informe --sandbox
 
 - `--sandbox` corre el sandbox (Docker) sobre desarrollo y validación. Sin él, usa los resultados que ya existan en `resultados/dinamico` y `resultados/dinamico_val`, y avisa de qué fecha son.
 - `--sin-validacion` y `--sin-reales` saltan esos conjuntos. Los reales nunca pasan por el sandbox.
-- Para los 100 reales tarda unos 12 minutos. Los reales tienen que ser la muestra oficial: `python frente_a_estatico/recolectar.py corpus/real --desde-muestra corpus/muestra_real.json`.
+- Con los 100 reales tarda unos 12 minutos. Los reales deben ser la muestra oficial: `python frente_a_estatico/recolectar.py corpus/real --desde-muestra corpus/muestra_real.json`.
 
 | Archivo | Para qué |
 | --- | --- |
 | `tablas.md` | Tablas listas para el informe: desarrollo frente a validación, qué detecta cada técnica, recall por categoría, matrices y resumen de reales |
 | `tabla_resumen.csv`, `tabla_categorias.csv` | Las mismas cifras para hacer gráficos (separadas con `;`, se abren directo en Excel) |
-| `resumen.md` | Fecha, versión del código, analizadores, errores y avisos. **Revisarlo siempre** |
+| `resumen.md` | Fecha, versión del código, analizadores, errores y avisos |
 | `reporte_real_anonimo.md` | Riesgo por servidor real con nombres S01, S02… Este es el que va al informe |
 | `revision_manual.csv` | Hallazgos reales para revisar a mano. **Privado**: tiene nombres reales |
 | `mapa_anonimizacion.csv` | S01 → nombre real. **Privado** |
 
-Las tablas de validación son privadas mientras alguien siga escribiendo reglas o heurísticas. Cuando el frente B entregue, se repite la corrida y sus columnas aparecen solas.
 
 ## Revisión manual de los hallazgos reales
 
 Sin revisión manual, los hallazgos en servidores reales son sospechas, no vulnerabilidades. Para estimar cuántos son correctos:
 
-1. Abre `revision_manual.csv` en Excel. Para cada hallazgo, mira el código en `corpus/real/<servidor>/<ubicacion>` y escribe en **veredicto**:
+1. En `revision_manual.csv` (se abre en Excel), para cada hallazgo se revisa el código en `corpus/real/<servidor>/<ubicacion>` y se anota en **veredicto**:
    - `verdadero`: el problema existe (por ejemplo, un parámetro de una herramienta llega de verdad a `exec`).
    - `falso`: no es un problema (por ejemplo, el comando es fijo o lo arma el propio autor).
    - `dudoso`: no se puede decidir leyendo el código.
    En **nota**, una frase con el porqué.
-2. Guarda el archivo (como CSV) y corre:
+2. Con el archivo guardado como CSV:
    ```bash
    python -m frente_c_pipeline.revision resultados/informe/<fecha_hora>/revision_manual.csv
    ```
    Imprime la precisión estimada en servidores reales, global, por categoría y por regla, y la guarda en `revision_resumen.md`.
 
-Es la respuesta a la pregunta de investigación 1 y la cifra que más valida el trabajo. Si algún hallazgo es un problema real y grave, se aplica el protocolo de la sección de ética del README principal antes de mencionarlo.
+En la corrida final, la revisión de los 27 hallazgos reales dio 21 verdaderos y 6 falsos; los verdaderos de severidad alta corresponden a una sola vulnerabilidad (S01). Los problemas reales graves se tratan según la sección de ética del README principal antes de mencionarlos.
 
-## Pendiente
+## Trabajo futuro
 
-1. Repetir la corrida para el informe cuando el frente B entregue.
-2. Revisar a mano los hallazgos reales (sección anterior).
-3. Observar la red del contenedor (trabajo futuro).
+- Registrar los intentos de conexión del contenedor, para detectar la exfiltración de forma dinámica.

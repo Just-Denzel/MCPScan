@@ -260,8 +260,8 @@ def main() -> None:
         if e:
             _escribir_json(out / f"errores_{nombre}.json", e)
     if "validacion" in evals:
-        avisos.append("Las tablas incluyen la VALIDACIÓN PRIVADA: no las compartas con quien todavía "
-                      "esté escribiendo reglas o heurísticas.")
+        avisos.append("Las tablas incluyen el conjunto de validación: si se ajustan reglas o heurísticas "
+                      "mirando estos resultados, deja de ser un conjunto ciego.")
     if hay_reales:
         avisos.append("revision_manual.csv y mapa_anonimizacion.csv tienen nombres reales: no van al informe ni a git. "
                       "Al informe va reporte_real_anonimo.md.")

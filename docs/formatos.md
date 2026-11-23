@@ -1,6 +1,6 @@
 # Formatos acordados
 
-Las tres partes del proyecto se conectan solo por estos formatos. **La fuente de verdad es `comun/formatos.py`**; este documento lo explica. Si hay que cambiar algo, se avisa al grupo antes.
+Las tres partes del proyecto se conectan solo por estos formatos. **La fuente de verdad es `comun/formatos.py`**; este documento lo explica.
 
 ## 1. Corpus
 
@@ -39,7 +39,7 @@ corpus/<conjunto>/
 ]
 ```
 
-- Las descripciones de los **parámetros** van en `esquema.properties.<parámetro>.description`. El modelo también las lee, así que el frente B debe revisarlas.
+- Las descripciones de los **parámetros** van en `esquema.properties.<parámetro>.description`. El modelo también las lee, así que el frente B también las revisa.
 - El banco de pruebas trae `herramientas.json` listo. Los servidores reales descargados de npm **no lo traen**: `frente_b_descripciones/extractor.py` lo reconstruye leyendo el código (ver `frente_b_descripciones/README.md`). Las herramientas extraídas traen dos campos más: `origen` (`codigo/<archivo>:<línea>` donde se definen) y `patron` (cómo se encontraron).
 - `fuente` es `npm` para los reales y `local` para los del banco de pruebas.
 
@@ -89,6 +89,6 @@ Para agregar una categoría: agregarla en `comun/formatos.py`, en el ground trut
 
 ## 4. Ground truth
 
-`corpus/banco_de_pruebas/ground_truth.json` indica, para cada servidor de prueba, si es benigno o malicioso y qué hallazgos se esperan (categoría, archivo, línea). **Los analizadores no deben leerlo**; solo lo usa `evaluar.py`.
+`corpus/banco_de_pruebas/ground_truth.json` indica, para cada servidor de prueba, si es benigno o malicioso y qué hallazgos se esperan (categoría, archivo, línea). **Los analizadores no lo leen**; solo lo usa `evaluar.py`.
 
 El evaluador cuenta un acierto cuando coinciden **servidor y categoría**. Varios hallazgos de la misma categoría en el mismo servidor cuentan como uno.

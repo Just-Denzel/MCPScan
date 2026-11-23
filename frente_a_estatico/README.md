@@ -2,12 +2,14 @@
 
 Detecta patrones peligrosos en el código de los servidores **sin ejecutarlo**.
 
-## Qué hay que entregar
+## Qué hay en esta carpeta
 
-1. **Recolección** de 50 a 100 servidores públicos de npm. Ya hecha: `recolectar.py`.
-2. **Reglas de Semgrep** para el código, en `reglas/`.
-3. **Detectores propios en Python** para lo que Semgrep no cubre bien (`package.json`, dependencias).
-4. Un `analizador.py` que junte todo y devuelva hallazgos.
+| Archivo | Qué hace |
+| --- | --- |
+| `recolectar.py` | Descarga servidores públicos de npm al corpus, sin instalarlos ni ejecutarlos |
+| `reglas/` | Reglas de Semgrep para el código JavaScript y TypeScript |
+| `detectores_python.py` | Detectores para lo que Semgrep no cubre bien (`package.json`, dependencias, secretos) |
+| `analizador.py` | Junta las dos cosas y devuelve hallazgos (`analizar()` para el pipeline) |
 
 ## Cómo se conecta al pipeline
 
@@ -25,9 +27,9 @@ rules:
 
 Si Semgrep falla, el analizador lanza un error en vez de devolver una lista vacía, y el pipeline lo registra. Así un fallo no se confunde con "no hay hallazgos".
 
-## Estado
+## Categorías
 
-Las 7 categorías del frente están implementadas:
+Las 7 categorías del frente:
 
 | Categoría | Cómo se detecta | Dónde |
 | --- | --- | --- |
@@ -39,12 +41,12 @@ Las 7 categorías del frente están implementadas:
 | `dependencia-typosquat` | Python: distancia de edición contra una lista de paquetes populares | `detectores_python.py` |
 | `script-instalacion` | Python: `preinstall`, `install`, `postinstall` (severidad alta si sale a la red o ejecuta código) | `detectores_python.py` |
 
-Resultados (21 de noviembre de 2026):
+Resultados (corrida final del 23 de noviembre de 2026):
 
 | Conjunto | Precisión | Recall del frente A | Benignos marcados |
 | --- | --- | --- | --- |
 | Desarrollo | 1,00 | 9 de 9 | 0 de 6 |
-| Validación privada | 1,00 | 8 de 8 | 0 de 3 |
+| Validación | 1,00 | 8 de 8 | 0 de 3 |
 
 ### Severidad
 
@@ -68,9 +70,9 @@ El banco de desarrollo y la validación siguen en 9 de 9 y 8 de 8 sin falsos pos
 
 Los casos de `tests/casos_reglas/` documentan qué debe y qué no debe detectar cada regla; `tests/test_reglas.py` los comprueba.
 
-## Cuidado con los falsos positivos
+## Benignos parecidos a los maliciosos
 
-El banco de pruebas trae benignos que se parecen a los maliciosos, justamente para atrapar reglas demasiado amplias:
+El banco de pruebas trae benignos que se parecen a los maliciosos, para detectar reglas demasiado amplias:
 
 | Benigno | Qué regla ingenua lo marcaría |
 | --- | --- |
@@ -81,7 +83,7 @@ El banco de pruebas trae benignos que se parecen a los maliciosos, justamente pa
 
 `tests/test_pipeline.py` falla si una regla marca algún benigno.
 
-## Cómo probarlo solo
+## Cómo correrlo
 
 ```bash
 python -m frente_c_pipeline.pipeline corpus/banco_de_pruebas resultados/a.json --analizadores frente_a_estatico.analizador
@@ -89,11 +91,11 @@ python -m frente_c_pipeline.evaluar corpus/banco_de_pruebas/ground_truth.json re
 python -m pytest -q
 ```
 
-Mirar la columna `A:analizador` de la matriz de detección y que ningún benigno salga marcado.
+La columna `A:analizador` de la matriz de detección muestra qué encuentra este frente.
 
 ## Descargar el corpus real
 
-El registry de MCP cambia con el tiempo: la misma semilla, en otra fecha, sortea otra muestra (entre el 9 y el 22 de noviembre solo coincidían 33 de 100 servidores). Por eso la muestra oficial del proyecto está guardada en **`corpus/muestra_real.json`** (paquete, versión e integridad de cada servidor), y todos descargan exactamente esa:
+El registry de MCP cambia con el tiempo: la misma semilla, en otra fecha, sortea otra muestra (entre el 9 y el 22 de noviembre solo coincidían 33 de 100 servidores). Por eso la muestra oficial del proyecto está guardada en **`corpus/muestra_real.json`** (paquete, versión e integridad de cada servidor), y se descarga exactamente esa:
 
 ```bash
 python frente_a_estatico/recolectar.py corpus/real --desde-muestra corpus/muestra_real.json
@@ -113,12 +115,12 @@ python frente_a_estatico/recolectar.py corpus/real --exportar-muestra corpus/mue
 
 - Solo descarga y descomprime. **Nunca ejecuta `npm install` ni scripts.**
 - Si se interrumpe, se puede volver a correr: no repite lo ya descargado y rehace lo que quedó a medias.
-- Deja fuera los servidores solo remotos, los de PyPI y los paquetes de más de 20 MB (o 200 MB descomprimidos). Hay que decirlo en las limitaciones.
+- Deja fuera los servidores solo remotos, los de PyPI y los paquetes de más de 20 MB (o 200 MB descomprimidos).
 
 ## Notas
 
-- Muchos paquetes de npm traen JavaScript compilado o minificado, no TypeScript (el caso `exfil-minificado` lo imita en `dist/`). Las reglas deben revisar todos los archivos, no solo `src/`, y los hallazgos en código minificado cuestan más de leer.
+- Muchos paquetes de npm traen JavaScript compilado o minificado, no TypeScript (el caso `exfil-minificado` lo imita en `dist/`). Por eso las reglas revisan todos los archivos, no solo `src/`; los hallazgos en código minificado cuestan más de leer.
 - Semgrep corre con límites explícitos (archivos de hasta 10 MB y 120 s por regla, en `analizador.py`). Con los valores por defecto (1 MB y 5 s) se perdían hallazgos en archivos compilados grandes sin avisar, y el resultado cambiaba según la máquina. Si aun así no puede analizar un archivo completo, el pipeline muestra `ATENCIÓN … puede faltar algún hallazgo`.
 - Con esos límites, los 100 servidores reales toman unos 11 minutos.
 - Semgrep funciona en Windows (probado). Instalarlo en el mismo Python o entorno virtual con que se corre el pipeline: `python -m pip install semgrep`.
-- Los hallazgos sobre servidores reales se **revisan a mano** antes de afirmar nada, y se anonimizan en el informe.
+- Los hallazgos sobre servidores reales se revisaron a mano antes de afirmar nada, y se anonimizan en el informe. En la corrida final, 6 de los 100 servidores tienen un archivo que Semgrep no pudo analizar completo (`PartialParsing`).

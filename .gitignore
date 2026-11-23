@@ -1,8 +1,7 @@
 # Corpus real descargado (se regenera con frente_a_estatico/recolectar.py)
 corpus/real/
 corpus/control/
-# Conjunto de validación PRIVADO: no se comparte con quienes escriben reglas.
-# Solo lo tiene el frente C; hay que guardar una copia de validacion_privada.py fuera del repo.
+# Conjunto de validación: fuera del repositorio para que siga siendo un conjunto ciego.
 corpus/validacion/
 frente_c_pipeline/validacion_privada.py
 # Salidas de las corridas

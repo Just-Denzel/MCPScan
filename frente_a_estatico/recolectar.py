@@ -11,7 +11,7 @@ Requiere Python 3.12 o superior. Tres formas de uso, desde la raíz del reposito
          python frente_a_estatico/recolectar.py corpus/real --desde-muestra corpus/muestra_real.json
 
 El registry de MCP cambia con el tiempo: la misma semilla en otra fecha da otra muestra.
-Para que todo el equipo analice los mismos servidores, se usa la forma 3.
+Para que la muestra sea reproducible, se usa la forma 3.
 
 - Lista servidores del registry oficial de MCP (solo la última versión, activos, con paquete npm).
 - Para no sesgar hacia la "A", toma una página desde muchos puntos de partida (cursores).
@@ -158,7 +158,7 @@ def exportar_muestra(salida: Path, archivo: Path) -> None:
         "fuente": "registry oficial de MCP + npm",
         "servidores": filas,
     }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
-    print(f"Muestra de {len(filas)} servidores guardada en {archivo}. Súbela a git para que el equipo la use.")
+    print(f"Muestra de {len(filas)} servidores guardada en {archivo}. Versiónala en git para reproducir el análisis.")
 
 
 def desde_muestra(salida: Path, archivo: Path) -> None:
@@ -209,7 +209,7 @@ def muestra_nueva(salida: Path, n: int, semilla: int) -> None:
     print(f"\nListo: {ok} servidores en {salida}. Fallos: {len(fallos)}")
     for p, e in fallos[:10]:
         print(f"  - {p}: {e}")
-    print("Para que el equipo use esta misma muestra, guárdala con --exportar-muestra.")
+    print("Para reproducir esta misma muestra, guárdala con --exportar-muestra.")
 
 
 def main() -> None:

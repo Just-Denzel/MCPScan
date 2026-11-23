@@ -31,26 +31,30 @@ python -m frente_b_descripciones.comparar corpus/real --repeticiones 3
 python -m frente_b_descripciones.comparar corpus/real --sin-llm        # sin clave de API
 
 # Extraer las herramientas de los servidores reales a herramientas.json (opcional: el pipeline
-# las extrae solo si falta el archivo; esto sirve para revisarlas y para el % del informe)
+# las extrae solo si falta el archivo; esto sirve para revisarlas y medir cuántas se extraen)
 python -m frente_b_descripciones.extractor corpus/real --resumen resultados/extraccion_real.json
 ```
 
 ### Clave de API del clasificador
 
-Por defecto usa **Gemini 3.6 Flash** con el nivel gratuito de la API de Google. La clave se saca gratis en [Google AI Studio](https://aistudio.google.com/apikey) y va en una variable de entorno, **nunca en el repositorio**:
+Por defecto usa **Gemini 3.6 Flash** con el nivel gratuito de la API de Google. La clave se saca gratis en [Google AI Studio](https://aistudio.google.com/apikey) y va en un archivo `.env` en la raíz del repositorio (está en `.gitignore`) o en una variable de entorno, **nunca en un archivo versionado**:
 
-```bash
-export GEMINI_API_KEY=...          # cmd: set GEMINI_API_KEY=...   PowerShell: $env:GEMINI_API_KEY="..."
+```
+GEMINI_API_KEY=...
+MCPSCAN_LLM_MODELO=gemini-3.5-flash-lite
+MCPSCAN_LLM_RPM=12
 ```
 
+**Modelo usado en la evaluación: `gemini-3.5-flash-lite`.** En el nivel gratuito, Gemini 3.6 Flash permite solo 20 llamadas al día (y 5 por minuto), lo que no alcanza para el banco, la validación y los reales; Flash Lite permite 500 al día y 15 por minuto. `MCPSCAN_LLM_RPM` espacia las llamadas para no pasar el límite por minuto.
+
 - Temperatura 0 y razonamiento en `low` (en Gemini 3 no se puede apagar). Se cambian con `MCPSCAN_LLM_TEMPERATURA` y `MCPSCAN_LLM_RAZONAMIENTO`.
-- El nivel gratuito limita las llamadas por minuto: si la API responde 429, el clasificador espera lo que pida y reintenta. Si se agota el límite diario, se vuelve a correr al otro día y lo ya respondido sale de la caché.
+- El nivel gratuito limita las llamadas por minuto: si la API responde 429 o 503, el clasificador espera y reintenta, y muestra el avance y los errores por consola. Si se agota el límite diario, se vuelve a correr al otro día y lo ya respondido sale de la caché. Ctrl+C lo detiene en cualquier momento.
 - En el nivel gratuito, Google puede usar los prompts para mejorar sus productos. Aquí solo se envían descripciones de herramientas públicas o del banco.
 - El costo que reporta `comparar.py` es el del nivel pagado (1,50 / 7,50 USD por millón de tokens, el razonamiento se cobra como salida): sirve para estimar el costo a escala. Con el nivel gratuito el costo real es 0.
 
-Otros proveedores: con `ANTHROPIC_API_KEY` (y sin `GEMINI_API_KEY`) usa `claude-haiku-5-5`; con `OPENAI_API_KEY`, `MCPSCAN_LLM_PROVEEDOR=openai`, `MCPSCAN_LLM_MODELO` y, si no es OpenAI, `MCPSCAN_LLM_URL` (OpenRouter, Ollama). Para forzar uno: `MCPSCAN_LLM_PROVEEDOR=gemini|anthropic|openai`. El resto de las opciones está al inicio de `clasificador_llm.py`. **En el informe hay que indicar el modelo usado.**
+Otros proveedores: con `ANTHROPIC_API_KEY` (y sin `GEMINI_API_KEY`) usa `claude-haiku-5-5`; con `OPENAI_API_KEY`, `MCPSCAN_LLM_PROVEEDOR=openai`, `MCPSCAN_LLM_MODELO` y, si no es OpenAI, `MCPSCAN_LLM_URL` (OpenRouter, Ollama). Para forzar uno: `MCPSCAN_LLM_PROVEEDOR=gemini|anthropic|openai`. El resto de las opciones está al inicio de `clasificador_llm.py`.
 
-Cada respuesta se guarda en `resultados/cache_llm/` con sus tokens, costo y tiempo. Repetir una corrida no vuelve a llamar a la API, y si alguien comparte esa carpeta, los demás reproducen sus resultados sin clave. Sin clave y sin caché, el clasificador falla con un mensaje claro en cada servidor (el pipeline lo registra y sigue); para correr solo lo demás, usar `--analizadores`.
+Cada respuesta se guarda en `resultados/cache_llm/` con sus tokens, costo y tiempo. Repetir una corrida no vuelve a llamar a la API, y si alguien comparte esa carpeta, los demás reproducen sus resultados sin clave. Sin clave y sin caché, el clasificador falla con un mensaje claro (el pipeline lo registra y sigue); para correr solo lo demás, usar `--analizadores`. Los tests nunca leen el `.env`.
 
 Volumen estimado: unos 20 mil tokens de entrada para el banco y unos 300 mil para los 88 servidores reales con herramientas, por repetición.
 
@@ -93,28 +97,37 @@ Cada herramienta extraída trae además `origen` (archivo y línea, que se usa c
 
 Los servidores sin herramientas son sobre todo envoltorios de binarios (Go, Rust), servidores que bajan su catálogo de herramientas desde la red al arrancar o que las generan desde datos; ninguno se puede resolver sin ejecutar código.
 
-## Resultados al 22 de noviembre de 2026
+## Resultados
 
-Banco de desarrollo, solo las categorías de B:
+Corrida del 23 de noviembre de 2026 con `comparar.py`: `gemini-3.5-flash-lite`, temperatura 0, razonamiento `low`, prompt `clasificador_v2`, 3 repeticiones por servidor con decisión por mayoría (1 en los reales). Solo las categorías de B:
 
-| Servidor | Esperado | Heurísticas | LLM |
+| Conjunto | Técnica | Aciertos | Falsos + | Falsos − | Precisión | Recall | Benignos marcados |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Desarrollo (18) | Heurísticas | 5 | 0 | 0 | 1,00 | 1,00 | 0 de 6 |
+| Desarrollo (18) | LLM | 4 | 1 | 1 | 0,80 | 0,80 | 0 de 6 |
+| Validación (13) | Heurísticas | 4 | 0 | 0 | 1,00 | 1,00 | 0 de 3 |
+| Validación (13) | LLM | 3 | 0 | 1 | 1,00 | 0,75 | 0 de 3 |
+
+| Clasificador LLM | Desarrollo | Validación | Reales (88 con herramientas) |
 | --- | --- | --- | --- |
-| `poison-instruccion-oculta` | instrucción | ✓ | pendiente |
-| `poison-unicode-invisible` | unicode | ✓ | pendiente |
-| `poison-parafraseado` | parafraseado | ✓ | pendiente |
-| `poison-parametro` | instrucción | ✓ | pendiente |
-| `poison-otra-herramienta` | instrucción | ✓ | pendiente |
-| benignos (incluido `benigno-busqueda-proyecto`) | nada | sin falsos positivos | pendiente |
+| Llamadas | 54 | 39 | 88 |
+| Tiempo medio por llamada | 2,7 s | 5,4 s | 2,9 s |
+| Consistencia entre repeticiones (herramientas / servidores) | 0,95 / 0,94 | 0,92 / 0,92 | — |
+| Costo | 0 (nivel gratuito) | 0 | 0 |
 
-Con el frente A, el pipeline completo queda en precisión 1,00 y recall 1,00 en desarrollo (14 de 14 problemas, 0 benignos marcados).
+Las heurísticas tardan menos de 1 ms por servidor y dan el mismo resultado en cada corrida.
 
-En los servidores reales, las heurísticas no marcan nada en los 88 de la muestra ni en los 51 de control con herramientas. **Ojo al citarlo:** la primera versión marcaba 16 descripciones legítimas en 11 servidores (instrucciones de uso normales: "nunca reportes...", "usa X en lugar de Y", "deja las credenciales fuera"), y las reglas se ajustaron mirando esos casos, también los de la muestra de control. Ese 0 no es una medida independiente de falsos positivos; la medida limpia es el conjunto de validación privado del frente C.
+- El LLM marcó **todos los servidores envenenados** de los dos conjuntos y ningún benigno. Sus dos fallos son de subcategoría: en `poison-parafraseado` detectó el problema pero lo clasificó como instrucción explícita, y en `val-poison-ancho-cero` reportó solo el texto oculto (`unicode`) y no además la instrucción, porque el clasificador asigna una sola categoría cuando hay texto oculto.
+- La ventaja esperada del LLM en las instrucciones parafraseadas no apareció: las heurísticas también detectan los casos del banco, incluido el de otro idioma (inglés) de la validación.
+- En los servidores reales, ninguna de las dos técnicas marca nada en los 88 de la muestra, y las heurísticas tampoco en los 51 de control con herramientas. **Nota:** la primera versión de las heurísticas marcaba 16 descripciones legítimas en 11 servidores (instrucciones de uso normales: "nunca reportes...", "usa X en lugar de Y", "deja las credenciales fuera"), y las reglas se ajustaron mirando esos casos, también los de la muestra de control. Por eso ese 0 no es una medida independiente de falsos positivos; la medida limpia es el conjunto de validación.
 
-Las columnas del LLM quedan pendientes: hay que correr `comparar.py` con una clave de API.
+Con el frente A, el pipeline completo queda en recall 1,00 en desarrollo y en validación (ver el README principal).
 
-## Limitaciones (para el informe)
+## Limitaciones
 
-- Las heurísticas solo conocen español e inglés: la misma instrucción en portugués u otro idioma se les escapa. Es la familia "en otro idioma" de `parafraseado`, donde se espera que gane el LLM.
+- Las heurísticas solo conocen español e inglés: la misma instrucción en portugués u otro idioma se les escapa. Es la familia "en otro idioma" de `parafraseado`, donde el LLM debería tener ventaja (el banco no trae un caso así).
 - Distinguir instrucción explícita de parafraseada por la redacción es frágil; una orden con tono amable puede caer en la otra categoría.
 - El extractor ve el código, no lo que el servidor entrega en ejecución: descripciones armadas con datos de la red o del entorno quedan incompletas, y un servidor podría mostrar una descripción en el código y otra distinta al correr (*rug pull*, extensión propuesta).
-- Cuando el texto escondido en Unicode es además una instrucción, se reporta solo como `tool-poisoning-unicode`, igual que en el ground truth del banco (la especificación dice que también podría contar como instrucción).
+- Cuando el texto escondido en Unicode es además una instrucción, el clasificador LLM lo reporta solo como `tool-poisoning-unicode` (la especificación dice que cuenta también como instrucción, y así lo espera el caso de ancho cero de la validación).
+- El LLM se evaluó con un modelo liviano (Gemini 3.5 Flash Lite), elegido por la cuota del nivel gratuito; un modelo mayor podría acertar mejor las subcategorías.
+- El banco tiene pocos casos de tool poisoning (5 en desarrollo y 4 en validación) y la muestra real no tiene ninguno, así que el recall fuera del banco no se pudo medir.

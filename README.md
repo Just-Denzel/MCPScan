@@ -5,13 +5,13 @@ Herramienta que analiza servidores MCP públicos y entrega un reporte de riesgo 
 - **Código del servidor** (frente A): ejecución de comandos con datos del modelo, lectura de archivos sensibles, envío de datos a dominios externos, secretos hardcodeados, dependencias sospechosas y scripts de instalación.
 - **Descripciones de las herramientas** (frente B): *tool poisoning*, es decir, instrucciones ocultas dirigidas al modelo dentro del texto que describe una herramienta.
 
-Proyecto final del curso de seguridad (PUC Chile, 2026-2). Entrega del informe y el código: 24 de noviembre de 2026.
+Proyecto final del curso de Seguridad Computacional (PUC Chile, 2026-2).
 
 **Integrantes:** Mario Rojas, Mauricio Pino, Fernando García.
 
-## Cómo encaja todo
+## Arquitectura
 
-Tres partes que se desarrollan en paralelo y terminan siendo una sola herramienta. Se conectan solo por el contrato de `comun/formatos.py` (explicado en [docs/formatos.md](docs/formatos.md)).
+Tres partes que forman una sola herramienta y se conectan solo por el contrato de `comun/formatos.py` (explicado en [docs/formatos.md](docs/formatos.md)).
 
 ```
                           corpus/  (una carpeta por servidor)
@@ -38,7 +38,7 @@ MCPScan/
 ├── comun/
 │   └── formatos.py              Contrato: categorías, severidades, hallazgo() y validar()
 ├── docs/
-│   ├── formatos.md              El contrato explicado (leer primero)
+│   ├── formatos.md              El contrato explicado
 │   └── categorias.md            Qué cuenta en cada categoría y sus variantes
 ├── corpus/
 │   ├── banco_de_pruebas/        18 servidores propios + ground_truth.json (desarrollo, versionado)
@@ -69,18 +69,18 @@ MCPScan/
 └── resultados/                  salidas de las corridas (NO se suben a git)
 ```
 
-Cada frente tiene su propio README con qué entregar, qué falta y cómo probarlo.
+Cada frente tiene su propio README con su diseño, cómo correrlo y sus resultados.
 
 ## Desarrollo y validación
 
-Hay dos conjuntos de servidores de prueba:
+Hay dos conjuntos de servidores de prueba, con respuestas conocidas:
 
-- **Desarrollo** (`corpus/banco_de_pruebas`): todos lo ven y lo usan mientras escriben reglas y heurísticas.
-- **Validación** (`corpus/validacion`): variantes nuevas que **solo tiene el frente C** y que no se suben a git. Se evalúa una vez, al final.
+- **Desarrollo** (`corpus/banco_de_pruebas`, 18 servidores): se usó para escribir y ajustar las reglas y heurísticas.
+- **Validación** (`corpus/validacion`, 13 servidores): variantes nuevas de las mismas familias de ataque, que no se vieron al escribir las reglas. No está en el repositorio, para que siga siendo un conjunto ciego.
 
-Las reglas se escriben contra la especificación de [docs/categorias.md](docs/categorias.md), no contra los ejemplos del banco. En el informe se reportan los dos resultados: si la validación da mucho peor que el desarrollo, las reglas memorizaron los ejemplos en vez de generalizar.
+Las reglas se escribieron contra la especificación de [docs/categorias.md](docs/categorias.md), no contra los ejemplos del banco. Si la validación diera mucho peor que el desarrollo, las reglas habrían memorizado los ejemplos en vez de generalizar.
 
-## Cómo conectar cada parte al pipeline
+## Cómo agregar un analizador
 
 Un analizador es un módulo de Python con una función que devuelve hallazgos, construidos con `hallazgo()` de `comun/formatos.py`:
 
@@ -92,9 +92,9 @@ def analizar(dir_servidor: Path) -> list[dict]:
                      regla="mi-regla", severidad="alta", evidencia="...", ubicacion="codigo/a.js:10")]
 ```
 
-1. Escribir `analizar()` en un módulo del frente (ya hay un esqueleto en A y B).
+1. Escribir `analizar()` en un módulo nuevo.
 2. Agregar el módulo a `ANALIZADORES`, en `frente_c_pipeline/pipeline.py`.
-3. Probarlo solo contra el banco de pruebas y mirar su fila en la matriz de detección.
+3. Probarlo contra el banco de pruebas y mirar su columna en la matriz de detección.
 
 `hallazgo()` rechaza categorías o severidades que no existen, así que un error de tipeo se ve de inmediato. Si un analizador falla en un servidor, el pipeline lo registra y sigue con el resto.
 
@@ -106,7 +106,7 @@ Desde la raíz del repositorio:
 pip install -r requirements.txt
 
 # Pipeline completo sobre el banco de pruebas
-# (el clasificador LLM del frente B necesita GEMINI_API_KEY, gratis; ver frente_b_descripciones/README.md)
+# (el clasificador LLM del frente B necesita GEMINI_API_KEY en un archivo .env; ver frente_b_descripciones/README.md)
 python -m frente_c_pipeline.pipeline corpus/banco_de_pruebas resultados/hallazgos.json
 
 # Comparación de las técnicas del frente B (heurísticas frente a LLM)
@@ -133,40 +133,43 @@ Notas para Windows:
 - Docker Desktop es necesario solo para el sandbox.
 - Si `python` no funciona, probar con `py`.
 
-## Flujo de trabajo en git
-
-- Una rama por frente: `frente-a`, `frente-b`, `frente-c`. Se une a `main` con un pull request, cuando los tests pasan y otra persona lo revisó.
-- Cada uno edita **solo su carpeta**. `comun/formatos.py` es de todos: cambiarlo se avisa antes.
-- La CI de GitHub corre los tests y compila el banco de pruebas en cada push. Si falla, no se une.
-- Nunca subir claves de API: van en variables de entorno o en `.env`, que está en `.gitignore`.
-
 ## Seguridad y ética
 
-- El análisis es estático: **no se ejecuta código de terceros.** Los paquetes se descargan y descomprimen, nunca se instalan ni se corren sus scripts.
-- Los servidores del banco de pruebas son nuestros y están diseñados para ser inertes (dominios `.invalid`, claves de ejemplo). No se publican como paquetes.
-- Si aparece código realmente malicioso o una vulnerabilidad grave en un servidor real: avisar a sus autores, a la plataforma (GitHub o npm) y al equipo docente **antes** de divulgar nada.
-- En el informe y la presentación se anonimizan los servidores reales (`reporte.py --anonimizar`) y no se incluyen secretos ni datos sensibles encontrados.
+- El análisis es estático: **no se ejecuta código de terceros.** Los paquetes se descargan y descomprimen, nunca se instalan ni se corren sus scripts. El sandbox solo ejecuta los servidores propios del banco de pruebas.
+- Los servidores del banco de pruebas son propios y están diseñados para ser inertes (dominios `.invalid`, claves de ejemplo). No se publican como paquetes.
+- Las vulnerabilidades encontradas en servidores reales se informan a sus autores y al equipo docente **antes** de cualquier divulgación.
+- Los servidores reales se nombran de forma anónima (S01, S02…, con `reporte.py --anonimizar`), y no se publican secretos ni datos sensibles encontrados.
+- Las claves de API van en un archivo `.env` o en variables de entorno, nunca en el repositorio (`.env` está en `.gitignore`).
+- La CI de GitHub corre los tests y compila el banco de pruebas en cada push.
 
-## Estado actual
+## Resultados
 
-| Pieza | Estado |
-| --- | --- |
-| Contrato común (`comun/formatos.py`) | Listo, con validación |
-| Banco de desarrollo: 18 servidores (6 benignos, 12 maliciosos) | Listo; compila con `tsc` y el generador lo reproduce idéntico |
-| Conjunto de validación: 13 servidores (3 benignos, 10 maliciosos) | Listo; privado, fuera de git |
-| Pipeline, evaluador y reporte | Listos y probados |
-| Tests y CI | 46 tests pasando; CI activa en GitHub |
-| Descarga de servidores públicos | Lista y probada con 100 paquetes de npm |
-| Sandbox con Docker | Probado en Windows con Docker Desktop: confirma la inyección con payloads, sin marcar benignos. Aislamiento comprobado (sin red, solo lectura) |
-| Frente A | Terminado: 7 categorías y regla específica de MCP; 9 de 9 en desarrollo y 8 de 8 en validación, sin falsos positivos; en reales, la severidad alta solo marca la inyección real |
-| Frente B (descripciones) | Heurísticas, clasificador LLM, extractor y comparación listos. Heurísticas: 5 de 5 en desarrollo, sin falsos positivos. Extractor: herramientas de 88 de los 100 reales. Falta correr el LLM con una clave de API |
-| Corrida para el informe y revisión manual | Listas (`corrida_informe.py`, `revision.py`) |
+Corrida final del 23 de noviembre de 2026 (versión `6f6a617`, Semgrep 1.184.0), con el análisis estático, las heurísticas, el clasificador LLM y el sandbox:
 
-Resultados con el frente A y las heurísticas del frente B (22 de noviembre de 2026), sin marcar ningún benigno:
+| Conjunto | Servidores | Precisión | Recall | Maliciosos detectados | Benignos marcados |
+| --- | --- | --- | --- | --- | --- |
+| Desarrollo | 18 | 0,93 | 1,00 (14 de 14 problemas) | 12 de 12 | 0 de 6 |
+| Validación | 13 | 1,00 | 1,00 (12 de 12 problemas) | 10 de 10 | 0 de 3 |
 
-| Conjunto | Precisión | Recall |
+Aciertos y falsos positivos de cada técnica (un acierto es un par servidor y categoría):
+
+| Técnica | Desarrollo | Validación |
 | --- | --- | --- |
-| Desarrollo (18 servidores) | 1,00 | 1,00 (14 de 14 problemas) |
-| Validación (13 servidores) | pendiente: la corre el frente C | |
+| A: análisis estático | 9 aciertos, 0 falsos positivos | 8 aciertos, 0 falsos positivos |
+| B: heurísticas | 5, 0 | 4, 0 |
+| B: clasificador LLM | 4, 1 | 3, 0 |
+| Sandbox | 2, 0 | 1, 0 |
 
-Antes del frente B, el recall era 0,71 en desarrollo y 0,67 en validación; los problemas que faltaban eran todos de tool poisoning. En los 100 servidores reales, el frente A tiene 18 hallazgos en 4 servidores, pendientes de revisión manual; las heurísticas del frente B no marcan ninguno de los 88 servidores cuyas herramientas se pudieron extraer.
+El único falso positivo es del clasificador LLM: detectó el servidor `poison-parafraseado`, pero lo clasificó como instrucción explícita en vez de parafraseada. Sin el LLM, la precisión en desarrollo es 1,00.
+
+En los **100 servidores reales** (muestra de `corpus/muestra_real.json`), el análisis estático marca 27 hallazgos en 7 servidores. La revisión manual confirmó **una vulnerabilidad real**: una inyección de comandos en la que los argumentos que envía el modelo llegan sin validar a una shell (S01), informada a su mantenedor. Las dos técnicas del frente B no marcan ninguno de los 88 servidores cuyas herramientas se pudieron extraer.
+
+Detalle de cada parte: [frente A](frente_a_estatico/README.md), [frente B](frente_b_descripciones/README.md), [frente C](frente_c_pipeline/README.md).
+
+## Limitaciones
+
+- Solo servidores de npm, con código JavaScript o TypeScript; quedan fuera los servidores solo remotos, los de PyPI y los paquetes muy grandes.
+- La regla específica de MCP sigue el dato dentro de un mismo archivo. En algunos archivos minificados grandes Semgrep no logra un análisis completo y lo avisa.
+- Los hallazgos de severidad media en servidores reales requieren revisión manual.
+- El banco tiene pocos casos por categoría y no hay tool poisoning en la muestra real, así que el recall del frente B fuera del banco no se pudo medir.
+- El sandbox solo confirma lo que se refleja en la respuesta y no registra intentos de conexión a la red.

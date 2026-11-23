@@ -1,10 +1,8 @@
 # Especificación de categorías
 
-Qué cuenta como cada problema, qué no cuenta y en qué formas puede aparecer. **Las reglas y heurísticas se escriben contra esta especificación, no contra los casos del banco de pruebas.**
+Qué cuenta como cada problema, qué no cuenta y en qué formas puede aparecer. **Las reglas y heurísticas se escribieron contra esta especificación, no contra los casos del banco de pruebas.**
 
-Por qué importa: el banco de desarrollo (`corpus/banco_de_pruebas`) tiene uno o dos ejemplos por categoría. Una regla hecha a la medida de ese ejemplo puede sacar 100 % ahí y fallar con cualquier variante. Al final del proyecto, los analizadores se evalúan también contra un **conjunto de validación** con variantes que ustedes no han visto, todas tomadas de las familias descritas abajo. La diferencia entre ambos resultados es la que muestra si una regla generaliza o solo memorizó el ejemplo.
-
-Para cada categoría, piensen: ¿mi regla detecta *todas* las variantes listadas? ¿Marca alguno de los casos de "No cuenta"?
+El banco de desarrollo (`corpus/banco_de_pruebas`) tiene uno o dos ejemplos por categoría, y una regla hecha a la medida de ese ejemplo podría sacar 100 % ahí y fallar con cualquier variante. Por eso los analizadores se evaluaron también contra un **conjunto de validación** con variantes que no se vieron al escribirlos, tomadas de las familias descritas abajo. La diferencia entre ambos resultados muestra si una regla generaliza o solo memorizó el ejemplo.
 
 ## Consideraciones generales
 
@@ -42,7 +40,6 @@ Lee archivos con credenciales o secretos del usuario, sin que la función lo jus
 Claves o credenciales escritas en cualquier archivo del paquete.
 
 - **Variantes:** claves de nube (AWS `AKIA...`), tokens de plataformas (GitHub `ghp_...`, Slack, claves `sk-...` de APIs de IA), URLs de webhooks con el secreto incluido, claves privadas. Pueden estar en constantes, objetos de configuración o encabezados.
-- **Recomendado:** usar gitleaks en vez de escribir patrones a mano.
 
 ### `dependencia-typosquat`
 Una dependencia con un nombre casi igual al de un paquete popular.
@@ -54,7 +51,7 @@ Una dependencia con un nombre casi igual al de un paquete popular.
 El `package.json` define scripts que corren solos al instalar: `preinstall`, `install` o `postinstall`.
 
 - **Más grave si:** descarga un script de internet y lo ejecuta en una shell, sale a la red o lee datos del sistema.
-- **Ojo:** la presencia del script ya es la categoría. La severidad sube según lo que hace.
+- **Nota:** la presencia del script ya es la categoría. La severidad sube según lo que hace.
 
 ### `codigo-ofuscado`
 Texto codificado que se decodifica y **se ejecuta** como código.
@@ -86,4 +83,4 @@ La descripción contiene caracteres invisibles.
 Una instrucción maliciosa redactada para no parecerlo.
 
 - **Variantes:** tono de recomendación o de "paso de rutina" en vez de orden; sin palabras clave típicas (*ignore*, *important*, *secret*); **en otro idioma** (inglés u otros).
-- Es la categoría donde se espera que el clasificador LLM le gane a las heurísticas.
+- Es la categoría donde se esperaba que el clasificador LLM superara a las heurísticas; en el banco y en la validación no fue así (ver `frente_b_descripciones/README.md`).
