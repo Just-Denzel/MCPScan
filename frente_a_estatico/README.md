@@ -66,6 +66,8 @@ La primera versión de las reglas tuvo precisión 1,00 en el banco, pero en la r
 | Control (67 reales) | antes | 1 (0) | 15 (2) |
 | Control (67 reales) | después | 0 | 16 (2) |
 
+**Nota sobre la corrida final (23 de noviembre de 2026):** ahí la severidad alta registra **18 hallazgos, no 9**. Son los mismos 9 de `src/index.ts`, repetidos en el código compilado (`dist/index.js`) que trae el mismo paquete: el analizador revisa los dos archivos. Todos corresponden a una sola vulnerabilidad en un solo servidor (S01). La tabla de arriba cuenta 9, sin duplicados. En el informe se cuenta por problema distinto (servidor y categoría), lo que evita este doble conteo.
+
 El banco de desarrollo y la validación siguen en 9 de 9 y 8 de 8 sin falsos positivos. Límite: la muestra de control no tiene ninguna inyección real, así que en ella se midió que la severidad alta no da falsas alarmas, no su capacidad de encontrar inyecciones reales. La validación se usó para comprobar que no se rompiera nada, así que su resultado ya no es del todo ciego para esta versión.
 
 Los casos de `tests/casos_reglas/` documentan qué debe y qué no debe detectar cada regla; `tests/test_reglas.py` los comprueba.

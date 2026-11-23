@@ -133,7 +133,7 @@ Sin revisión manual, los hallazgos en servidores reales son sospechas, no vulne
    ```
    Imprime la precisión estimada en servidores reales, global, por categoría y por regla, y la guarda en `revision_resumen.md`.
 
-En la corrida final, la revisión de los 27 hallazgos reales dio 21 verdaderos y 6 falsos; los verdaderos de severidad alta corresponden a una sola vulnerabilidad (S01). Los problemas reales graves se tratan según la sección de ética del README principal antes de mencionarlos.
+En la corrida final, la revisión de los 27 hallazgos reales dio 21 verdaderos y 6 falsos, pero 10 de los verdaderos repiten en el código compilado (`dist/`) puntos del código fuente de S01. Sin contarlos dos veces: 17 hallazgos, 11 verdaderos y 6 falsos. Por problema distinto (servidor y categoría), que es como se reporta: 7 problemas, 2 verdaderos (precisión 0,29), la inyección de comandos de S01 y el script `postinstall` de S07. Los problemas reales graves se tratan según la sección de ética del README principal antes de mencionarlos.
 
 ## Trabajo futuro
 

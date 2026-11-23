@@ -162,7 +162,7 @@ Aciertos y falsos positivos de cada técnica (un acierto es un par servidor y ca
 
 El único falso positivo es del clasificador LLM: detectó el servidor `poison-parafraseado`, pero lo clasificó como instrucción explícita en vez de parafraseada. Sin el LLM, la precisión en desarrollo es 1,00.
 
-En los **100 servidores reales** (muestra de `corpus/muestra_real.json`), el análisis estático marca 27 hallazgos en 7 servidores. La revisión manual confirmó **una vulnerabilidad real**: una inyección de comandos en la que los argumentos que envía el modelo llegan sin validar a una shell (S01), informada a su mantenedor. Las dos técnicas del frente B no marcan ninguno de los 88 servidores cuyas herramientas se pudieron extraer.
+En los **100 servidores reales** (muestra de `corpus/muestra_real.json`), el análisis estático marca **7 problemas distintos** (servidor y categoría) en 7 servidores. La revisión manual confirmó 2 (precisión 0,29): un script `postinstall` (S07) y **una vulnerabilidad real**, una inyección de comandos en la que los argumentos que envía el modelo llegan sin validar a una shell (S01), informada a su mantenedor. Contados como hallazgos sueltos son 27, pero 10 repiten en el código compilado (`dist/`) puntos del código fuente de S01; sin duplicados son 17, de los cuales 11 son verdaderos. Las dos técnicas del frente B no marcan ninguno de los 88 servidores cuyas herramientas se pudieron extraer.
 
 Detalle de cada parte: [frente A](frente_a_estatico/README.md), [frente B](frente_b_descripciones/README.md), [frente C](frente_c_pipeline/README.md).
 
