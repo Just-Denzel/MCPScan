@@ -58,6 +58,10 @@ def _correr_llm(dirs: list[Path], repeticiones: int) -> dict:
             por_rep = clasificador_llm.veredictos(d, repeticiones, cfg)
         except clasificador_llm.ErrorLLM as e:
             errores.append({"servidor": d.name, "error": str(e)})
+            print(f"  ERROR del LLM en {d.name}: {e}", flush=True)
+            if e.fatal:
+                print("  Se detiene el LLM: este error se repetiría en todos los servidores.", flush=True)
+                break
             continue
         # Consistencia: cada herramienta, ¿recibió la misma categoría (o ninguna) en todas las repeticiones?
         cats = [{s["nombre"]: clasificador_llm.categoria(s) for s in rep} for rep in por_rep]
@@ -199,4 +203,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nInterrumpido. Las respuestas que ya llegaron quedaron en la caché: al repetir el comando no se "
+              "vuelven a pedir.")
+        raise SystemExit(130)

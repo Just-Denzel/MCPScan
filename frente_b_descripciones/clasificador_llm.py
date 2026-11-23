@@ -11,7 +11,8 @@ a un LLM con el prompt de prompts/clasificador_v2.md y convierte su respuesta JS
 Por defecto usa Gemini 3.6 Flash con el nivel gratuito de la API de Google (clave gratis en
 https://aistudio.google.com/apikey).
 
-Configuración por variables de entorno (la clave NUNCA va en el repositorio):
+Configuración por variables de entorno o en un archivo .env en la raíz del repositorio (está en el
+.gitignore; la clave NUNCA va en un archivo versionado):
     GEMINI_API_KEY                       clave de Gemini (también sirve GOOGLE_API_KEY)
     ANTHROPIC_API_KEY / OPENAI_API_KEY   claves de los otros proveedores
     MCPSCAN_LLM_PROVEEDOR                gemini | anthropic | openai. Si no se indica, se usa el de la
@@ -23,6 +24,10 @@ Configuración por variables de entorno (la clave NUNCA va en el repositorio):
     MCPSCAN_LLM_REPETICIONES             llamadas por servidor; se vota por mayoría (por defecto 1)
     MCPSCAN_LLM_PRECIO_ENTRADA / _SALIDA USD por millón de tokens, si el modelo no está en PRECIOS
     MCPSCAN_LLM_CACHE                    carpeta de caché (por defecto resultados/cache_llm)
+    MCPSCAN_LLM_TIMEOUT                  segundos máximos por llamada (por defecto 120)
+    MCPSCAN_LLM_RPM                      máximo de llamadas por minuto (espacia las llamadas para no
+                                         chocar con el límite del nivel gratuito; por defecto sin límite)
+    MCPSCAN_LLM_SILENCIO                 1 para no mostrar el avance por consola
 
 Cada respuesta se guarda en la caché, con sus tokens, costo y tiempo. Repetir una corrida no
 vuelve a pagar, y con la caché de otra persona se reproducen sus resultados sin clave.
@@ -31,6 +36,8 @@ import hashlib
 import json
 import os
 import re
+import sys
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -73,7 +80,27 @@ CATEGORIA = {"explicita": "tool-poisoning-instruccion", "encubierta": "tool-pois
 
 
 class ErrorLLM(RuntimeError):
-    pass
+    """fatal=True: el error se repetiría en todos los servidores (clave, modelo o URL inválidos)."""
+
+    def __init__(self, mensaje: str, fatal: bool = False):
+        super().__init__(mensaje)
+        self.fatal = fatal
+
+
+def avisar(mensaje: str) -> None:
+    """Avance y errores por consola (stderr), para que una espera larga no parezca un cuelgue."""
+    if os.environ.get("MCPSCAN_LLM_SILENCIO") != "1":
+        print(f"    [LLM {time.strftime('%H:%M:%S')}] {mensaje}", file=sys.stderr, flush=True)
+
+
+def _mensaje_api(detalle: str) -> str:
+    """El campo 'message' del error JSON de la API, o el texto tal cual."""
+    try:
+        datos = json.loads(detalle)
+        datos = datos[0] if isinstance(datos, list) and datos else datos
+        return str(datos["error"]["message"])[:300]
+    except (ValueError, KeyError, TypeError, IndexError):
+        return detalle[:300]
 
 
 # --------------------------------------------------------------------------- configuración
@@ -82,7 +109,24 @@ def _clave(proveedor: str) -> str | None:
     return next((os.environ[v] for v in PROVEEDORES[proveedor][0] if os.environ.get(v)), None)
 
 
+def cargar_env(ruta: Path = RAIZ / ".env") -> None:
+    """Lee VARIABLE=valor de un .env en la raíz del repo (ignorado por git). No pisa variables ya definidas."""
+    if not ruta.is_file():
+        return
+    for linea in ruta.read_text(encoding="utf-8-sig").splitlines():
+        linea = linea.strip()
+        if not linea or linea.startswith("#") or "=" not in linea:
+            continue
+        nombre, valor = linea.removeprefix("export ").split("=", 1)
+        nombre, valor = nombre.strip(), valor.strip()
+        if len(valor) >= 2 and valor[0] == valor[-1] and valor[0] in "\"'":
+            valor = valor[1:-1]
+        if nombre and valor:
+            os.environ.setdefault(nombre, valor)
+
+
 def configuracion() -> dict:
+    cargar_env()
     proveedor = os.environ.get("MCPSCAN_LLM_PROVEEDOR")
     if not proveedor:
         proveedor = next((p for p in PROVEEDORES if _clave(p)), "gemini")
@@ -152,10 +196,31 @@ def mensajes(lote: list[dict]) -> tuple[str, str]:
 # --------------------------------------------------------------------------- llamadas
 
 def _post(url: str, cabeceras: dict, cuerpo: dict) -> dict:
+    """POST en un hilo aparte: el hilo principal revisa cada 0,2 s, así Ctrl+C corta al tiro (en Windows
+    una lectura de red bloqueada no se interrumpe con Ctrl+C) y se avisa si la respuesta tarda."""
     req = urllib.request.Request(url, data=json.dumps(cuerpo).encode("utf-8"),
                                  headers={"content-type": "application/json", **cabeceras}, method="POST")
-    with urllib.request.urlopen(req, timeout=180) as r:
-        return json.load(r)
+    limite = float(os.environ.get("MCPSCAN_LLM_TIMEOUT") or 120)
+    salida: dict = {}
+
+    def trabajar():
+        try:
+            with urllib.request.urlopen(req, timeout=limite) as r:
+                salida["r"] = json.load(r)
+        except BaseException as e:   # se relanza en el hilo principal
+            salida["e"] = e
+
+    hilo = threading.Thread(target=trabajar, daemon=True)
+    hilo.start()
+    inicio, proximo_aviso = time.time(), 20.0
+    while hilo.is_alive():
+        hilo.join(0.2)
+        if time.time() - inicio > proximo_aviso and hilo.is_alive():
+            avisar(f"sigue esperando la respuesta ({proximo_aviso:.0f} s)...")
+            proximo_aviso += 20
+    if "e" in salida:
+        raise salida["e"]
+    return salida["r"]
 
 
 def _llamar_api(cfg: dict, sistema: str, usuario: str, temperatura: float | None,
@@ -188,6 +253,19 @@ def _llamar_api(cfg: dict, sistema: str, usuario: str, temperatura: float | None
     return {"texto": texto, "tokens_entrada": u.get("prompt_tokens", 0), "tokens_salida": u.get("completion_tokens", 0)}
 
 
+_ULTIMA_LLAMADA = [0.0]
+
+
+def _respetar_rpm() -> None:
+    """Si MCPSCAN_LLM_RPM está definido, deja al menos 60/RPM segundos entre llamadas reales."""
+    rpm = float(os.environ.get("MCPSCAN_LLM_RPM") or 0)
+    if rpm > 0:
+        falta = _ULTIMA_LLAMADA[0] + 60.0 / rpm - time.time()
+        if falta > 0:
+            time.sleep(falta)
+    _ULTIMA_LLAMADA[0] = time.time()
+
+
 def _llamar_con_reintentos(cfg: dict, sistema: str, usuario: str) -> dict:
     temperatura, razonamiento = cfg["temperatura"], cfg.get("razonamiento")
     espera, intento, limites = 2.0, 0, 0
@@ -195,33 +273,44 @@ def _llamar_con_reintentos(cfg: dict, sistema: str, usuario: str) -> dict:
         try:
             return _llamar_api(cfg, sistema, usuario, temperatura, razonamiento)
         except urllib.error.HTTPError as e:
-            detalle = e.read().decode("utf-8", "replace")[:400]
+            detalle = e.read().decode("utf-8", "replace")[:2000]
+            mensaje = _mensaje_api(detalle)
             if e.code == 400 and "temperature" in detalle and temperatura is not None:
+                avisar(f"el modelo no acepta temperatura; se reintenta sin ella ({mensaje})")
                 temperatura = None   # modelos que no aceptan temperatura: se usa la del proveedor
                 continue
             if e.code == 400 and "reasoning" in detalle and razonamiento is not None:
+                avisar(f"el modelo no acepta reasoning_effort; se reintenta sin él ({mensaje})")
                 razonamiento = None  # modelos sin esfuerzo de razonamiento configurable
                 continue
             if e.code == 429 and limites + 1 < REINTENTOS_LIMITE:
-                # Límite por minuto: se espera lo que pide la API (Retry-After) o cada vez más.
+                # Límite por minuto: se espera lo que pide la API (Retry-After o retryDelay) o cada vez más.
                 limites += 1
                 pedida = e.headers.get("retry-after") if e.headers else None
-                time.sleep(min(float(pedida) if pedida and pedida.replace(".", "", 1).isdigit() else espera,
-                               ESPERA_MAXIMA))
+                m = re.search(r'"retryDelay"\s*:\s*"(\d+(?:\.\d+)?)s"', detalle)
+                pedida = pedida if pedida and pedida.replace(".", "", 1).isdigit() else (m.group(1) if m else None)
+                pausa = min(float(pedida) if pedida else espera, ESPERA_MAXIMA)
+                avisar(f"429 límite de uso: espero {pausa:.0f} s (espera {limites}/{REINTENTOS_LIMITE - 1}). {mensaje}")
+                time.sleep(pausa)
                 espera = min(espera * 2, ESPERA_MAXIMA)
                 continue
             if e.code in (408, 409, 500, 502, 503, 504, 529) and intento + 1 < REINTENTOS:
                 intento += 1
+                avisar(f"la API respondió {e.code}: reintento {intento}/{REINTENTOS - 1} en {espera:.0f} s. {mensaje}")
                 time.sleep(espera); espera = min(espera * 2, ESPERA_MAXIMA)
                 continue
+            if e.code in (400, 401, 403, 404):
+                raise ErrorLLM(f"la API respondió {e.code}: {mensaje} (revisa la clave, el modelo "
+                               f"'{cfg['modelo']}' y la URL)", fatal=True) from None
             if e.code == 429:
                 raise ErrorLLM(f"límite de uso de la API (429) después de {limites} esperas; si es el límite diario "
                                f"del nivel gratuito, vuelve a correr mañana: lo ya respondido queda en caché. "
                                f"{detalle}") from None
-            raise ErrorLLM(f"la API respondió {e.code}: {detalle}") from None
-        except (urllib.error.URLError, TimeoutError) as e:
+            raise ErrorLLM(f"la API respondió {e.code}: {mensaje}") from None
+        except (urllib.error.URLError, TimeoutError, OSError) as e:
             if intento + 1 < REINTENTOS:
                 intento += 1
+                avisar(f"sin respuesta de la API ({e}): reintento {intento}/{REINTENTOS - 1} en {espera:.0f} s")
                 time.sleep(espera); espera = min(espera * 2, ESPERA_MAXIMA)
                 continue
             raise ErrorLLM(f"no se pudo conectar con la API: {e}") from None
@@ -246,9 +335,12 @@ def consultar(cfg: dict, sistema: str, usuario: str, repeticion: int) -> dict:
         return r
     if not cfg["clave"]:
         raise ErrorLLM(f"falta la clave de API de {cfg['proveedor']}: define {' o '.join(cfg['variables_clave'])} "
-                       f"(no hay respuesta en caché en {cfg['cache']})")
+                       f"(no hay respuesta en caché en {cfg['cache']})", fatal=True)
+    _respetar_rpm()   # antes de medir: la pausa no cuenta como tiempo de respuesta
     inicio = time.time()
     r = transporte(cfg, sistema, usuario)
+    avisar(f"respuesta en {time.time() - inicio:.1f} s ({r['tokens_entrada']} tokens de entrada, "
+           f"{r['tokens_salida']} de salida)")
     r["segundos"] = round(time.time() - inicio, 2)
     r["costo_usd"] = (r["tokens_entrada"] * cfg["precio"][0] + r["tokens_salida"] * cfg["precio"][1]) / 1e6 \
         if cfg["precio"] else None
@@ -297,15 +389,19 @@ def veredictos(dir_servidor: Path, repeticiones: int | None = None, cfg: dict | 
     herramientas = cargar(Path(dir_servidor))
     n = repeticiones or cfg["repeticiones"]
     por_rep = []
+    todos = lotes(herramientas)
     for rep in range(n):
         sospechosas = []
-        for lote in lotes(herramientas):
+        for i, lote in enumerate(todos, 1):
+            avisar(f"{Path(dir_servidor).name}: repetición {rep + 1}/{n}, lote {i}/{len(todos)} "
+                   f"({len(lote)} herramientas)")
             sistema, usuario = mensajes(lote)
             r = consultar(cfg, sistema, usuario, rep)
             try:
                 sospechosas += interpretar(r["texto"], lote)
-            except ErrorLLM:
+            except ErrorLLM as e:
                 # Una respuesta mal formada se pide una vez más con otra clave de caché.
+                avisar(f"respuesta mal formada, se pide de nuevo: {e}")
                 r = consultar(cfg, sistema, usuario + "\n\n(Reintento: responde solo con el JSON pedido.)", rep)
                 sospechosas += interpretar(r["texto"], lote)
         por_rep.append(sospechosas)
