@@ -37,20 +37,19 @@ python -m frente_b_descripciones.extractor corpus/real --resumen resultados/extr
 
 ### Clave de API del clasificador
 
-Por defecto usa **Gemini 3.6 Flash** con el nivel gratuito de la API de Google. La clave se saca gratis en [Google AI Studio](https://aistudio.google.com/apikey) y va en un archivo `.env` en la raíz del repositorio (está en `.gitignore`) o en una variable de entorno, **nunca en un archivo versionado**:
+Por defecto usa **Gemini 3.5 Flash Lite** (`gemini-3.5-flash-lite`), el modelo con que se evaluó, en el nivel gratuito de la API de Google. La clave se saca gratis en [Google AI Studio](https://aistudio.google.com/apikey) y va en un archivo `.env` en la raíz del repositorio (está en `.gitignore`) o en una variable de entorno, **nunca en un archivo versionado**:
 
 ```
 GEMINI_API_KEY=...
-MCPSCAN_LLM_MODELO=gemini-3.5-flash-lite
 MCPSCAN_LLM_RPM=12
 ```
 
-**Modelo usado en la evaluación: `gemini-3.5-flash-lite`.** En el nivel gratuito, Gemini 3.6 Flash permite solo 20 llamadas al día (y 5 por minuto), lo que no alcanza para el banco, la validación y los reales; Flash Lite permite 500 al día y 15 por minuto. `MCPSCAN_LLM_RPM` espacia las llamadas para no pasar el límite por minuto.
+Se eligió Flash Lite por la cuota del nivel gratuito: Gemini 3.6 Flash permite solo 20 llamadas al día (y 5 por minuto), lo que no alcanza para el banco, la validación y los reales; Flash Lite permite 500 al día y 15 por minuto. `MCPSCAN_LLM_RPM` espacia las llamadas para no pasar el límite por minuto. Para usar otro modelo: `MCPSCAN_LLM_MODELO`.
 
 - Temperatura 0 y razonamiento en `low` (en Gemini 3 no se puede apagar). Se cambian con `MCPSCAN_LLM_TEMPERATURA` y `MCPSCAN_LLM_RAZONAMIENTO`.
 - El nivel gratuito limita las llamadas por minuto: si la API responde 429 o 503, el clasificador espera y reintenta, y muestra el avance y los errores por consola. Si se agota el límite diario, se vuelve a correr al otro día y lo ya respondido sale de la caché. Ctrl+C lo detiene en cualquier momento.
 - En el nivel gratuito, Google puede usar los prompts para mejorar sus productos. Aquí solo se envían descripciones de herramientas públicas o del banco.
-- El costo que reporta `comparar.py` es el del nivel pagado (1,50 / 7,50 USD por millón de tokens, el razonamiento se cobra como salida): sirve para estimar el costo a escala. Con el nivel gratuito el costo real es 0.
+- Con el nivel gratuito el costo real es 0. `comparar.py` estima el costo a escala solo para los modelos con precio en `PRECIOS` (al inicio de `clasificador_llm.py`); para Flash Lite no hay precio cargado y el costo aparece vacío. Se puede indicar con `MCPSCAN_LLM_PRECIO_ENTRADA` y `MCPSCAN_LLM_PRECIO_SALIDA`.
 
 Otros proveedores: con `ANTHROPIC_API_KEY` (y sin `GEMINI_API_KEY`) usa `claude-haiku-5-5`; con `OPENAI_API_KEY`, `MCPSCAN_LLM_PROVEEDOR=openai`, `MCPSCAN_LLM_MODELO` y, si no es OpenAI, `MCPSCAN_LLM_URL` (OpenRouter, Ollama). Para forzar uno: `MCPSCAN_LLM_PROVEEDOR=gemini|anthropic|openai`. El resto de las opciones está al inicio de `clasificador_llm.py`.
 

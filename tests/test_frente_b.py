@@ -272,7 +272,7 @@ def test_llm_proveedor_por_defecto_es_gemini(monkeypatch):
               "GEMINI_API_KEY", "GOOGLE_API_KEY", "ANTHROPIC_API_KEY", "OPENAI_API_KEY"):
         monkeypatch.delenv(v, raising=False)
     cfg = clasificador_llm.configuracion()
-    assert (cfg["proveedor"], cfg["modelo"], cfg["clave"]) == ("gemini", "gemini-3.6-flash", None)
+    assert (cfg["proveedor"], cfg["modelo"], cfg["clave"]) == ("gemini", "gemini-3.5-flash-lite", None)
     monkeypatch.setenv("ANTHROPIC_API_KEY", "a")
     assert clasificador_llm.configuracion()["proveedor"] == "anthropic"
     monkeypatch.setenv("GEMINI_API_KEY", "g")
@@ -304,4 +304,4 @@ def test_llm_gemini_llamada_y_espera_por_limite(monkeypatch):
     url, cabeceras, cuerpo = pedidos[-1]
     assert url == "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
     assert cabeceras == {"authorization": "Bearer g"}
-    assert cuerpo["model"] == "gemini-3.6-flash" and cuerpo["reasoning_effort"] == "low"
+    assert cuerpo["model"] == "gemini-3.5-flash-lite" and cuerpo["reasoning_effort"] == "low"

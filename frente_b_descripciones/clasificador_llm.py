@@ -8,7 +8,7 @@ a un LLM con el prompt de prompts/clasificador_v2.md y convierte su respuesta JS
     forma explicita   -> tool-poisoning-instruccion
     forma encubierta  -> tool-poisoning-parafraseado
 
-Por defecto usa Gemini 3.6 Flash con el nivel gratuito de la API de Google (clave gratis en
+Por defecto usa Gemini 3.5 Flash Lite, el modelo con que se evaluó, en el nivel gratuito de la API de Google (clave gratis en
 https://aistudio.google.com/apikey).
 
 Configuración por variables de entorno o en un archivo .env en la raíz del repositorio (está en el
@@ -17,7 +17,7 @@ Configuración por variables de entorno o en un archivo .env en la raíz del rep
     ANTHROPIC_API_KEY / OPENAI_API_KEY   claves de los otros proveedores
     MCPSCAN_LLM_PROVEEDOR                gemini | anthropic | openai. Si no se indica, se usa el de la
                                          primera clave que exista en ese orden (gemini si no hay ninguna)
-    MCPSCAN_LLM_MODELO                   por defecto gemini-3.6-flash o claude-haiku-5-5; con openai es obligatorio
+    MCPSCAN_LLM_MODELO                   por defecto gemini-3.5-flash-lite o claude-haiku-5-5; con openai es obligatorio
     MCPSCAN_LLM_URL                      URL base compatible con OpenAI (OpenRouter, Ollama, etc.)
     MCPSCAN_LLM_TEMPERATURA              por defecto 0
     MCPSCAN_LLM_RAZONAMIENTO             esfuerzo de razonamiento (reasoning_effort); por defecto low en Gemini
@@ -61,7 +61,7 @@ URL_GEMINI = "https://generativelanguage.googleapis.com/v1beta/openai"
 
 # USD por millón de tokens (entrada, salida), para prompts de menos de 100 mil tokens.
 # Fuentes: páginas de precios de las API de Anthropic y de Google (Gemini), noviembre de 2026.
-# Gemini 3.6 Flash es gratis en el nivel gratuito; el precio es el del nivel pagado, para estimar
+# Gemini es gratis en el nivel gratuito; el precio de 3.6 Flash es el del nivel pagado, para estimar
 # cuánto costaría usarlo a escala (el razonamiento se cobra como salida).
 PRECIOS = {
     "gemini-3.6-flash": (1.50, 7.50),
@@ -71,7 +71,7 @@ PRECIOS = {
 }
 PROVEEDORES = {
     # proveedor: (variables con la clave, modelo por defecto, URL por defecto)
-    "gemini": (("GEMINI_API_KEY", "GOOGLE_API_KEY"), "gemini-3.6-flash", URL_GEMINI),
+    "gemini": (("GEMINI_API_KEY", "GOOGLE_API_KEY"), "gemini-3.5-flash-lite", URL_GEMINI),
     "anthropic": (("ANTHROPIC_API_KEY",), "claude-haiku-5-5", "https://api.anthropic.com/v1/messages"),
     "openai": (("OPENAI_API_KEY",), "", "https://api.openai.com/v1"),
 }
