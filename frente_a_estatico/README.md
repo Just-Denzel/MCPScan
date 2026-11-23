@@ -57,16 +57,16 @@ Resultados (corrida final del 23 de noviembre de 2026):
 
 ### Mejora con servidores reales (22 de noviembre de 2026)
 
-La primera versión de las reglas tuvo precisión 1,00 en el banco, pero en la revisión manual de 100 servidores reales sus 9 hallazgos de severidad alta fueron falsos positivos, y la única inyección real estaba marcada como media. Se ajustaron las reglas mirando esos casos (que pasan a ser datos de desarrollo) y se midió en una **muestra de control** de 67 servidores que no se usó para ajustarlas (`corpus/muestra_control.json`):
+La primera versión de las reglas tuvo precisión 1,00 en el banco, pero en la revisión manual de 100 servidores reales sus 9 hallazgos de severidad alta fueron falsos positivos, y la única inyección real estaba marcada como media. Se ajustaron las reglas mirando esos casos (que pasan a ser datos de desarrollo) y se midió en una **muestra de control** de 67 servidores que no se usó para ajustarlas (`corpus/muestra_control.json`). Los hallazgos se cuentan sin duplicados: un mismo punto del código que aparece en el fuente (`src/`) y en el compilado (`dist/`) cuenta una vez.
 
 | Muestra | Versión | Alta: hallazgos (verdaderos) | Media: hallazgos (verdaderos) |
 | --- | --- | --- | --- |
-| Desarrollo (100 reales) | antes | 9 (0) | 7 (3) |
-| Desarrollo (100 reales) | después | 9 (9), todos de la misma vulnerabilidad | 9 (3) |
+| Desarrollo (100 reales) | antes | 9 (0) | 6 (2) |
+| Desarrollo (100 reales) | después | 9 (9), todos de la misma vulnerabilidad | 8 (2) |
 | Control (67 reales) | antes | 1 (0) | 15 (2) |
 | Control (67 reales) | después | 0 | 16 (2) |
 
-**Nota sobre la corrida final (23 de noviembre de 2026):** ahí la severidad alta registra **18 hallazgos, no 9**. Son los mismos 9 de `src/index.ts`, repetidos en el código compilado (`dist/index.js`) que trae el mismo paquete: el analizador revisa los dos archivos. Todos corresponden a una sola vulnerabilidad en un solo servidor (S01). La tabla de arriba cuenta 9, sin duplicados. En el informe se cuenta por problema distinto (servidor y categoría), lo que evita este doble conteo.
+La corrida final (23 de noviembre de 2026) registra 27 hallazgos en bruto porque el analizador revisa los dos archivos: los 9 de severidad alta y 1 de media de S01 aparecen también en su código compilado. Por problema distinto (servidor y categoría), que es como se reporta en el informe, la versión mejorada marca 7 problemas y 2 son verdaderos (precisión 0,29): la inyección de comandos de S01 y un script `postinstall`.
 
 El banco de desarrollo y la validación siguen en 9 de 9 y 8 de 8 sin falsos positivos. Límite: la muestra de control no tiene ninguna inyección real, así que en ella se midió que la severidad alta no da falsas alarmas, no su capacidad de encontrar inyecciones reales. La validación se usó para comprobar que no se rompiera nada, así que su resultado ya no es del todo ciego para esta versión.
 
